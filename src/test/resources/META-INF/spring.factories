@@ -1,0 +1,6 @@
+org.springframework.test.context.ContextCustomizerFactory = com.sportifyindia.\
+    app.config.TestContainersSpringContextCustomizerFactory,com.sportifyindia.\
+    app.config.SqlTestContainersSpringContextCustomizerFactory,com.\
+    sportifyindia.app.config.\
+    KafkaTestContainersSpringContextCustomizerFactory,com.sportifyindia.app.\
+    config.RedisTestContainersSpringContextCustomizerFactory
