@@ -1,6 +1,8 @@
 package com.sportifyindia.app.repository;
 
 import com.sportifyindia.app.domain.CourseSubscription;
+import com.sportifyindia.app.domain.enumeration.CourseSubscriptionStatusEnum;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -27,4 +29,8 @@ public interface CourseSubscriptionRepository extends JpaRepository<CourseSubscr
         "select courseSubscription from CourseSubscription courseSubscription where courseSubscription.course.id = ?1 and courseSubscription.user.login = ?#{principal.username}"
     )
     Optional<CourseSubscription> findOneByCourseAndUserIsCurrentUser(Long courseId);
+
+    List<CourseSubscription> findAllByStatusAndEndDateBefore(CourseSubscriptionStatusEnum status, Instant endDate);
+
+    List<CourseSubscription> findAllByStatusAndRemainingSessions(CourseSubscriptionStatusEnum status, Integer remainingSessions);
 }

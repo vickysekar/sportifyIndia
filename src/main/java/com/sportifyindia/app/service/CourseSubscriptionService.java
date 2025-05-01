@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,7 +129,11 @@ public class CourseSubscriptionService {
         courseSubscription.setEndDate(endDate);
 
         // Set initial remaining sessions
-        courseSubscription.setRemainingSessions(subscriptionPlan.getSessionLimit());
+        if (subscriptionPlan.getIsUnlimitedSessions()) {
+            courseSubscription.setRemainingSessions(null); // null indicates unlimited sessions
+        } else {
+            courseSubscription.setRemainingSessions(subscriptionPlan.getSessionLimit());
+        }
 
         // Set initial status
         courseSubscription.setStatus(CourseSubscriptionStatusEnum.ACTIVE);
@@ -251,5 +256,141 @@ public class CourseSubscriptionService {
     public Optional<CourseSubscriptionDTO> findOneByCourseAndUserIsCurrentUser(Long courseId) {
         log.debug("Request to get CourseSubscription for course : {}", courseId);
         return courseSubscriptionRepository.findOneByCourseAndUserIsCurrentUser(courseId).map(courseSubscriptionMapper::toDto);
+    }
+
+    /**
+     * Pause a subscription.
+     *
+     * @param id the id of the subscription to pause.
+     * @return the updated subscription.
+     */
+    public CourseSubscriptionDTO pause(Long id) {
+        log.debug("Request to pause CourseSubscription : {}", id);
+        return updateStatus(id, CourseSubscriptionStatusEnum.PAUSED, "Subscription paused");
+    }
+
+    /**
+     * Resume a paused subscription.
+     *
+     * @param id the id of the subscription to resume.
+     * @return the updated subscription.
+     */
+    public CourseSubscriptionDTO resume(Long id) {
+        log.debug("Request to resume CourseSubscription : {}", id);
+        return updateStatus(id, CourseSubscriptionStatusEnum.ACTIVE, "Subscription resumed");
+    }
+
+    /**
+     * Cancel a subscription.
+     *
+     * @param id the id of the subscription to cancel.
+     * @return the updated subscription.
+     */
+    public CourseSubscriptionDTO cancel(Long id) {
+        log.debug("Request to cancel CourseSubscription : {}", id);
+        return updateStatus(id, CourseSubscriptionStatusEnum.CANCELLED, "Subscription cancelled");
+    }
+
+    /**
+     * Complete a subscription.
+     *
+     * @param id the id of the subscription to complete.
+     * @return the updated subscription.
+     */
+    public CourseSubscriptionDTO complete(Long id) {
+        log.debug("Request to complete CourseSubscription : {}", id);
+        return updateStatus(id, CourseSubscriptionStatusEnum.COMPLETED, "Subscription completed");
+    }
+
+    /**
+     * Update the status of a subscription.
+     *
+     * @param id the id of the subscription.
+     * @param newStatus the new status to set.
+     * @param message the message to log.
+     * @return the updated subscription.
+     */
+    private CourseSubscriptionDTO updateStatus(Long id, CourseSubscriptionStatusEnum newStatus, String message) {
+        // Get current user
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Get the subscription
+        CourseSubscription courseSubscription = courseSubscriptionRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+
+        // Verify ownership
+        if (!courseSubscription.getUser().equals(currentUser.get())) {
+            throw new RuntimeException("You can only modify your own subscriptions");
+        }
+
+        // Validate status transition
+        validateStatusTransition(courseSubscription.getStatus(), newStatus);
+
+        // Update status
+        courseSubscription.setStatus(newStatus);
+        log.debug(message + " : {}", courseSubscription);
+
+        return courseSubscriptionMapper.toDto(courseSubscriptionRepository.save(courseSubscription));
+    }
+
+    /**
+     * Validate a status transition.
+     *
+     * @param currentStatus the current status.
+     * @param newStatus the new status.
+     * @throws IllegalArgumentException if the transition is not valid.
+     */
+    private void validateStatusTransition(CourseSubscriptionStatusEnum currentStatus, CourseSubscriptionStatusEnum newStatus) {
+        switch (currentStatus) {
+            case ACTIVE -> {
+                if (
+                    newStatus != CourseSubscriptionStatusEnum.PAUSED &&
+                    newStatus != CourseSubscriptionStatusEnum.CANCELLED &&
+                    newStatus != CourseSubscriptionStatusEnum.COMPLETED
+                ) {
+                    throw new IllegalArgumentException("Invalid status transition from ACTIVE to " + newStatus);
+                }
+            }
+            case PAUSED -> {
+                if (newStatus != CourseSubscriptionStatusEnum.ACTIVE && newStatus != CourseSubscriptionStatusEnum.CANCELLED) {
+                    throw new IllegalArgumentException("Invalid status transition from PAUSED to " + newStatus);
+                }
+            }
+            case EXPIRED, CANCELLED, COMPLETED -> throw new IllegalArgumentException("Cannot change status from " + currentStatus);
+        }
+    }
+
+    /**
+     * Automatically update subscription statuses based on end date and remaining sessions.
+     * This method runs every hour.
+     */
+    @Scheduled(fixedRate = 3600000) // 1 hour
+    @Transactional
+    public void updateSubscriptionStatuses() {
+        log.debug("Running scheduled subscription status update");
+        Instant now = Instant.now();
+
+        // Update expired subscriptions
+        courseSubscriptionRepository
+            .findAllByStatusAndEndDateBefore(CourseSubscriptionStatusEnum.ACTIVE, now)
+            .forEach(subscription -> {
+                subscription.setStatus(CourseSubscriptionStatusEnum.EXPIRED);
+                log.debug("Subscription expired : {}", subscription);
+            });
+
+        // Update completed subscriptions (only for limited sessions)
+        courseSubscriptionRepository
+            .findAllByStatusAndRemainingSessions(CourseSubscriptionStatusEnum.ACTIVE, 0)
+            .forEach(subscription -> {
+                // Only mark as completed if it's not an unlimited subscription
+                if (subscription.getRemainingSessions() != null) {
+                    subscription.setStatus(CourseSubscriptionStatusEnum.COMPLETED);
+                    log.debug("Subscription completed : {}", subscription);
+                }
+            });
     }
 }

@@ -62,6 +62,10 @@ public class SubscriptionPlan implements Serializable {
     private Integer sessionLimit;
 
     @NotNull
+    @Column(name = "is_unlimited_sessions", nullable = false)
+    private Boolean isUnlimitedSessions = false;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
@@ -187,6 +191,19 @@ public class SubscriptionPlan implements Serializable {
         this.sessionLimit = sessionLimit;
     }
 
+    public Boolean getIsUnlimitedSessions() {
+        return this.isUnlimitedSessions;
+    }
+
+    public void setIsUnlimitedSessions(Boolean isUnlimitedSessions) {
+        this.isUnlimitedSessions = isUnlimitedSessions;
+    }
+
+    public SubscriptionPlan isUnlimitedSessions(Boolean isUnlimitedSessions) {
+        this.setIsUnlimitedSessions(isUnlimitedSessions);
+        return this;
+    }
+
     public SubscriptionPlanStatusEnum getStatus() {
         return this.status;
     }
@@ -267,6 +284,7 @@ public class SubscriptionPlan implements Serializable {
             ", validityPeriod=" + getValidityPeriod() +
             ", noOfPauseDays=" + getNoOfPauseDays() +
             ", sessionLimit=" + getSessionLimit() +
+            ", isUnlimitedSessions=" + getIsUnlimitedSessions() +
             ", status='" + getStatus() + "'" +
             "}";
     }
