@@ -81,6 +81,66 @@ public class CacheConfiguration {
             createCache(cm, com.sportifyindia.app.domain.User.class.getName(), jcacheConfiguration);
             createCache(cm, com.sportifyindia.app.domain.Authority.class.getName(), jcacheConfiguration);
             createCache(cm, com.sportifyindia.app.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".facilityEmployees", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".courses", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".oneTimeEvents", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".utilities", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".saleLeads", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".taxMasters", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Facility.class.getName() + ".discounts", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Address.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.FacilityEmployee.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.FacilityEmployee.class.getName() + ".saleLeads", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.FacilityEmployee.class.getName() + ".tasks", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Course.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Course.class.getName() + ".subscriptionPlans", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.SubscriptionPlan.class.getName(), jcacheConfiguration);
+            createCache(
+                cm,
+                com.sportifyindia.app.domain.SubscriptionPlan.class.getName() + ".subscriptionAvailableDays",
+                jcacheConfiguration
+            );
+            createCache(cm, com.sportifyindia.app.domain.SubscriptionAvailableDay.class.getName(), jcacheConfiguration);
+            createCache(
+                cm,
+                com.sportifyindia.app.domain.SubscriptionAvailableDay.class.getName() + ".subscriptionPlans",
+                jcacheConfiguration
+            );
+            createCache(cm, com.sportifyindia.app.domain.TimeSlots.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.TimeSlots.class.getName() + ".subscriptionAvailableDays", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.TimeSlots.class.getName() + ".utilityAvailableDays", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.TimeSlots.class.getName() + ".utilitySlots", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.OneTimeEvent.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.OneTimeEvent.class.getName() + ".oneTimeEventSubscribers", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.OneTimeEventSubscribers.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Utility.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Utility.class.getName() + ".utilityAvailableDays", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Utility.class.getName() + ".utilityExceptionDays", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Utility.class.getName() + ".utilitySlots", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Utility.class.getName() + ".utilityBookings", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilityAvailableDays.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilityAvailableDays.class.getName() + ".utilities", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilityExceptionDays.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilitySlots.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilitySlots.class.getName() + ".utilityBookings", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.UtilityBookings.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.SaleLead.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.SaleLead.class.getName() + ".tasks", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.SaleLead.class.getName() + ".leadActivities", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Task.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Task.class.getName() + ".notes", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Notes.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.LeadActivity.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Charge.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Charge.class.getName() + ".taxes", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Order.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Order.class.getName() + ".charges", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Order.class.getName() + ".payments", jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Payment.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Tax.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.TaxMaster.class.getName(), jcacheConfiguration);
+            createCache(cm, com.sportifyindia.app.domain.Discount.class.getName(), jcacheConfiguration);
             // jhipster-needle-redis-add-entry
         };
     }
