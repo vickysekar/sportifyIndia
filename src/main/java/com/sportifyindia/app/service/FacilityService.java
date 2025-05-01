@@ -1,8 +1,11 @@
 package com.sportifyindia.app.service;
 
 import com.sportifyindia.app.domain.Facility;
+import com.sportifyindia.app.domain.User;
 import com.sportifyindia.app.repository.FacilityRepository;
 import com.sportifyindia.app.repository.search.FacilitySearchRepository;
+import com.sportifyindia.app.security.AuthoritiesConstants;
+import com.sportifyindia.app.security.SecurityUtils;
 import com.sportifyindia.app.service.dto.FacilityDTO;
 import com.sportifyindia.app.service.mapper.FacilityMapper;
 import java.util.LinkedList;
@@ -32,14 +35,18 @@ public class FacilityService {
 
     private final FacilitySearchRepository facilitySearchRepository;
 
+    private final UserService userService;
+
     public FacilityService(
         FacilityRepository facilityRepository,
         FacilityMapper facilityMapper,
-        FacilitySearchRepository facilitySearchRepository
+        FacilitySearchRepository facilitySearchRepository,
+        UserService userService
     ) {
         this.facilityRepository = facilityRepository;
         this.facilityMapper = facilityMapper;
         this.facilitySearchRepository = facilitySearchRepository;
+        this.userService = userService;
     }
 
     /**
@@ -51,6 +58,20 @@ public class FacilityService {
     public FacilityDTO save(FacilityDTO facilityDTO) {
         log.debug("Request to save Facility : {}", facilityDTO);
         Facility facility = facilityMapper.toEntity(facilityDTO);
+
+        // Get current user
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Check if user is a facility owner
+        if (!SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.FACILITY_OWNER)) {
+            throw new RuntimeException("Only facility owners can create facilities");
+        }
+
+        // Set the owner
+        facility.setUser(currentUser.get());
         facility = facilityRepository.save(facility);
         FacilityDTO result = facilityMapper.toDto(facility);
         facilitySearchRepository.index(facility);
@@ -65,7 +86,29 @@ public class FacilityService {
      */
     public FacilityDTO update(FacilityDTO facilityDTO) {
         log.debug("Request to update Facility : {}", facilityDTO);
+
+        // Get current user
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Check if user is a facility owner
+        if (!SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.FACILITY_OWNER)) {
+            throw new RuntimeException("Only facility owners can update facilities");
+        }
+
+        // Check if user is the owner of this facility
+        Optional<Facility> existingFacility = facilityRepository.findById(facilityDTO.getId());
+        if (existingFacility.isEmpty()) {
+            throw new RuntimeException("Facility not found");
+        }
+        if (!existingFacility.get().getUser().equals(currentUser.get())) {
+            throw new RuntimeException("Only the facility owner can update the facility");
+        }
+
         Facility facility = facilityMapper.toEntity(facilityDTO);
+        facility.setUser(currentUser.get()); // Ensure the owner remains the same
         facility = facilityRepository.save(facility);
         FacilityDTO result = facilityMapper.toDto(facility);
         facilitySearchRepository.index(facility);
@@ -81,11 +124,27 @@ public class FacilityService {
     public Optional<FacilityDTO> partialUpdate(FacilityDTO facilityDTO) {
         log.debug("Request to partially update Facility : {}", facilityDTO);
 
+        // Get current user
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Check if user is a facility owner
+        if (!SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.FACILITY_OWNER)) {
+            throw new RuntimeException("Only facility owners can update facilities");
+        }
+
         return facilityRepository
             .findById(facilityDTO.getId())
             .map(existingFacility -> {
-                facilityMapper.partialUpdate(existingFacility, facilityDTO);
+                // Check if user is the owner of this facility
+                if (!existingFacility.getUser().equals(currentUser.get())) {
+                    throw new RuntimeException("Only the facility owner can update the facility");
+                }
 
+                facilityMapper.partialUpdate(existingFacility, facilityDTO);
+                existingFacility.setUser(currentUser.get()); // Ensure the owner remains the same
                 return existingFacility;
             })
             .map(facilityRepository::save)
@@ -94,6 +153,22 @@ public class FacilityService {
                 return savedFacility;
             })
             .map(facilityMapper::toDto);
+    }
+
+    /**
+     * Get all the facilities for the current owner.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public Page<FacilityDTO> findAllForCurrentOwner(Pageable pageable) {
+        log.debug("Request to get all Facilities for current owner");
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        return facilityRepository.findByUserIsCurrentUser(pageable).map(facilityMapper::toDto);
     }
 
     /**
@@ -141,6 +216,17 @@ public class FacilityService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Facility : {}", id);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Check if user is the owner of this facility
+        Optional<Facility> facility = facilityRepository.findById(id);
+        if (facility.isPresent() && !facility.get().getUser().equals(currentUser.get())) {
+            throw new RuntimeException("Only the facility owner can delete the facility");
+        }
+
         facilityRepository.deleteById(id);
         facilitySearchRepository.deleteFromIndexById(id);
     }
