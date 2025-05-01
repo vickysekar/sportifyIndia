@@ -1,0 +1,47 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100458"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "facility_employee",
+  "fields": [
+    {
+      "fieldName": "position",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "EmployeeStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ACTIVE,INACTIVE,SUSPENDED"
+    }
+  ],
+  "name": "FacilityEmployee",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "facilityEmployee",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "saleLead",
+      "otherEntityRelationshipName": "facilityEmployee",
+      "relationshipName": "saleLead",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "facilityEmployee",
+      "relationshipName": "task",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

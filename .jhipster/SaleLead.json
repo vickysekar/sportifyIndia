@@ -1,0 +1,100 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101658"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "sale_lead",
+  "fields": [
+    {
+      "fieldName": "fullName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "title",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "customerType",
+      "fieldType": "CustomerTypeEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "INDIVIDUAL,BUSINESS,VIP"
+    },
+    {
+      "fieldName": "leadSource",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "leadStatus",
+      "fieldType": "LeadStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NEW,IN_PROGRESS,WON,LOST"
+    },
+    {
+      "fieldName": "dealExpiryDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "SaleLead",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "saleLead",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "facilityEmployee",
+      "otherEntityRelationshipName": "saleLead",
+      "relationshipName": "facilityEmployee",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "saleLead",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "saleLead",
+      "relationshipName": "task",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "leadActivity",
+      "otherEntityRelationshipName": "saleLead",
+      "relationshipName": "leadActivity",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

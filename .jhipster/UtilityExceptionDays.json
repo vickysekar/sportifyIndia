@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101358"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "utility_exception_days",
+  "fields": [
+    {
+      "fieldName": "reason",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "nestedTimeslots",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UtilityExceptionDays",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "utility",
+      "otherEntityRelationshipName": "utilityExceptionDays",
+      "relationshipName": "utility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

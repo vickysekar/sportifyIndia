@@ -1,0 +1,116 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100258"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "facility",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "contactNum",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "emailId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "latitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "longitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "imageLinks",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "FacilityStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "OPEN,CLOSED,UNDER_MAINTENANCE"
+    }
+  ],
+  "name": "Facility",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "address",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "address",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "facilityEmployee",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "facilityEmployee",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "course",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "course",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "oneTimeEvent",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "oneTimeEvent",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "utility",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "utility",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "saleLead",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "saleLead",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "taxMaster",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "taxMaster",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "discount",
+      "otherEntityRelationshipName": "facility",
+      "relationshipName": "discount",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

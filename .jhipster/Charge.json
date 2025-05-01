@@ -1,0 +1,75 @@
+{
+  "annotations": {
+    "changelogDate": "20250309102058"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "charge",
+  "fields": [
+    {
+      "fieldName": "beType",
+      "fieldType": "BusinessEntityEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SUBSCRIPTION,ONETIME_EVENT,UTILITY,COURSE"
+    },
+    {
+      "fieldName": "computedCharge",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "computedDiscount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "total",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "currency",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "discReason",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "exchangeRate",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "finalCharge",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Charge",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "charge",
+      "relationshipName": "order",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "charge",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "tax",
+      "otherEntityRelationshipName": "charge",
+      "relationshipName": "tax",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

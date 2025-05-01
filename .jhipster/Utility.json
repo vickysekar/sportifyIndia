@@ -1,0 +1,91 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101158"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "utility",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "termsAndConditions",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "pricePerSlot",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "maxCapacity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "latitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "longitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "requirements",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "UtilityStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "AVAILABLE,UNAVAILABLE,UNDER_MAINTENANCE"
+    }
+  ],
+  "name": "Utility",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "utility",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "utilityAvailableDays",
+      "otherEntityRelationshipName": "utility",
+      "relationshipName": "utilityAvailableDays",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "utilityExceptionDays",
+      "otherEntityRelationshipName": "utility",
+      "relationshipName": "utilityExceptionDays",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "utilitySlots",
+      "otherEntityRelationshipName": "utility",
+      "relationshipName": "utilitySlots",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "utilityBookings",
+      "otherEntityRelationshipName": "utility",
+      "relationshipName": "utilityBookings",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

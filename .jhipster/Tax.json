@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20250309102358"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "tax",
+  "fields": [
+    {
+      "fieldName": "netAmount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "computedSlab",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "computedAmount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taxType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taxSource",
+      "fieldType": "TaxSourceEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "FACILITY,USER,GOVERNMENT"
+    }
+  ],
+  "name": "Tax",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "charge",
+      "otherEntityRelationshipName": "tax",
+      "relationshipName": "charge",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

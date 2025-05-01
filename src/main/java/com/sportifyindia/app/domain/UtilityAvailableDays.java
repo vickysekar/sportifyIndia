@@ -1,0 +1,146 @@
+package com.sportifyindia.app.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A UtilityAvailableDays.
+ */
+@Entity
+@Table(name = "utility_available_days")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "utilityavailabledays")
+@SuppressWarnings("common-java:DuplicatedBlocks")
+public class UtilityAvailableDays implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @NotNull
+    @Column(name = "days_of_week", nullable = false)
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    private String daysOfWeek;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "subscriptionAvailableDays", "utilityAvailableDays", "utilitySlots" }, allowSetters = true)
+    private TimeSlots timeSlots;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "utilityAvailableDays")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @org.springframework.data.annotation.Transient
+    @JsonIgnoreProperties(
+        value = { "facility", "utilityAvailableDays", "utilityExceptionDays", "utilitySlots", "utilityBookings" },
+        allowSetters = true
+    )
+    private Set<Utility> utilities = new HashSet<>();
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public UtilityAvailableDays id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDaysOfWeek() {
+        return this.daysOfWeek;
+    }
+
+    public UtilityAvailableDays daysOfWeek(String daysOfWeek) {
+        this.setDaysOfWeek(daysOfWeek);
+        return this;
+    }
+
+    public void setDaysOfWeek(String daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
+    }
+
+    public TimeSlots getTimeSlots() {
+        return this.timeSlots;
+    }
+
+    public void setTimeSlots(TimeSlots timeSlots) {
+        this.timeSlots = timeSlots;
+    }
+
+    public UtilityAvailableDays timeSlots(TimeSlots timeSlots) {
+        this.setTimeSlots(timeSlots);
+        return this;
+    }
+
+    public Set<Utility> getUtilities() {
+        return this.utilities;
+    }
+
+    public void setUtilities(Set<Utility> utilities) {
+        if (this.utilities != null) {
+            this.utilities.forEach(i -> i.removeUtilityAvailableDays(this));
+        }
+        if (utilities != null) {
+            utilities.forEach(i -> i.addUtilityAvailableDays(this));
+        }
+        this.utilities = utilities;
+    }
+
+    public UtilityAvailableDays utilities(Set<Utility> utilities) {
+        this.setUtilities(utilities);
+        return this;
+    }
+
+    public UtilityAvailableDays addUtility(Utility utility) {
+        this.utilities.add(utility);
+        utility.getUtilityAvailableDays().add(this);
+        return this;
+    }
+
+    public UtilityAvailableDays removeUtility(Utility utility) {
+        this.utilities.remove(utility);
+        utility.getUtilityAvailableDays().remove(this);
+        return this;
+    }
+
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UtilityAvailableDays)) {
+            return false;
+        }
+        return getId() != null && getId().equals(((UtilityAvailableDays) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UtilityAvailableDays{" +
+            "id=" + getId() +
+            ", daysOfWeek='" + getDaysOfWeek() + "'" +
+            "}";
+    }
+}

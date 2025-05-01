@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity OneTimeEventSubscribers.
+    -->
+    <changeSet id="20250309101058-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="one_time_event_id"
+                                 baseTableName="one_time_event_subscribers"
+                                 constraintName="fk_one_time_event_subscribers__one_time_event_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="one_time_event"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="one_time_event_subscribers"
+                                 constraintName="fk_one_time_event_subscribers__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,58 @@
+{
+  "annotations": {
+    "changelogDate": "20250309102558"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "discount",
+  "fields": [
+    {
+      "fieldName": "discountCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "discountText",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "discountType",
+      "fieldType": "DiscountTypeEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PERCENTAGE,FIXED_AMOUNT"
+    },
+    {
+      "fieldName": "discountValue",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "beType",
+      "fieldType": "BusinessEntityEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SUBSCRIPTION,ONETIME_EVENT,UTILITY,COURSE"
+    }
+  ],
+  "name": "Discount",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "discount",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

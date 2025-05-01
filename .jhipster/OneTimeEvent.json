@@ -1,0 +1,99 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100958"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "one_time_event",
+  "fields": [
+    {
+      "fieldName": "eventName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "eventDesc",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "eventLatitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "eventLongitude",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "entryFee",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "maxCapacity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "eventDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "startTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "imageLinks",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "EventStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SCHEDULED,ONGOING,COMPLETED,CANCELLED"
+    },
+    {
+      "fieldName": "registrationDeadline",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "category",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "tags",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "termsAndConditions",
+      "fieldType": "String"
+    }
+  ],
+  "name": "OneTimeEvent",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "oneTimeEvent",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "oneTimeEventSubscribers",
+      "otherEntityRelationshipName": "oneTimeEvent",
+      "relationshipName": "oneTimeEventSubscribers",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

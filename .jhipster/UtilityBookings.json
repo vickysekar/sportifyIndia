@@ -1,0 +1,55 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101558"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "utility_bookings",
+  "fields": [
+    {
+      "fieldName": "amountPaid",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "bookedQuantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "startTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "BookingStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CONFIRMED,CANCELLED,COMPLETED"
+    }
+  ],
+  "name": "UtilityBookings",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "utility",
+      "otherEntityRelationshipName": "utilityBookings",
+      "relationshipName": "utility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "utilitySlots",
+      "otherEntityRelationshipName": "utilityBookings",
+      "relationshipName": "utilitySlots",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

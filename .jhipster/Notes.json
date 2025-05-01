@@ -1,0 +1,27 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101858"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "notes",
+  "fields": [
+    {
+      "fieldName": "noteText",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Notes",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "notes",
+      "relationshipName": "task",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

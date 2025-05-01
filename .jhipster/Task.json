@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101758"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "task",
+  "fields": [
+    {
+      "fieldName": "taskTitle",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taskDescription",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dueDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taskStatus",
+      "fieldType": "TaskStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING,IN_PROGRESS,COMPLETED"
+    }
+  ],
+  "name": "Task",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "saleLead",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "saleLead",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "facilityEmployee",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "facilityEmployee",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "notes",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "notes",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

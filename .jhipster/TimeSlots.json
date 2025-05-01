@@ -1,0 +1,46 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100858"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "time_slots",
+  "fields": [
+    {
+      "fieldName": "startTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "TimeSlots",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "subscriptionAvailableDay",
+      "otherEntityRelationshipName": "timeSlots",
+      "relationshipName": "subscriptionAvailableDay",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "utilityAvailableDays",
+      "otherEntityRelationshipName": "timeSlots",
+      "relationshipName": "utilityAvailableDays",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "utilitySlots",
+      "otherEntityRelationshipName": "timeSlots",
+      "relationshipName": "utilitySlots",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

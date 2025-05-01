@@ -1,0 +1,69 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100658"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "subscription_plan",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "validityType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "validityPeriod",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "noOfPauseDays",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sessionLimit",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "SubscriptionPlanStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ACTIVE,EXPIRED,CANCELLED"
+    }
+  ],
+  "name": "SubscriptionPlan",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "course",
+      "otherEntityRelationshipName": "subscriptionPlan",
+      "relationshipName": "course",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "subscriptionAvailableDay",
+      "otherEntityRelationshipName": "subscriptionPlan",
+      "relationshipName": "subscriptionAvailableDay",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

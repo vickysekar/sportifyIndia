@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity SubscriptionPlan.
+    -->
+    <changeSet id="20250309100658-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="course_id"
+                                 baseTableName="subscription_plan"
+                                 constraintName="fk_subscription_plan__course_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="course"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="subscription_plan_id"
+                                 baseTableName="rel_subscription_plan__subscription_available_day"
+                                 constraintName="fk_rel_subscription_plan__subsc__subscription_plan_dc_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="subscription_plan"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="subscription_available_day_id"
+                                 baseTableName="rel_subscription_plan__subscription_available_day"
+                                 constraintName="fk_rel_subscription_plan__subsc__subscription_available_da_85_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="subscription_available_day"
+                                 />
+    </changeSet>
+</databaseChangeLog>

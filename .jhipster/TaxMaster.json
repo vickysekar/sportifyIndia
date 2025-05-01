@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20250309102458"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "tax_master",
+  "fields": [
+    {
+      "fieldName": "taxSlab",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taxName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isActive",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taxType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "taxSource",
+      "fieldType": "TaxSourceEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "FACILITY,USER,GOVERNMENT"
+    }
+  ],
+  "name": "TaxMaster",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "taxMaster",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

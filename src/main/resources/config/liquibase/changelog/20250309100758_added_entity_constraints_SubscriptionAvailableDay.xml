@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity SubscriptionAvailableDay.
+    -->
+    <changeSet id="20250309100758-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="time_slots_id"
+                                 baseTableName="subscription_available_day"
+                                 constraintName="fk_subscription_available_day__time_slots_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="time_slots"
+                                 />
+    </changeSet>
+</databaseChangeLog>

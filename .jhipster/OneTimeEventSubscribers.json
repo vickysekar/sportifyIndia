@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20250309101058"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "one_time_event_subscribers",
+  "fields": [
+    {
+      "fieldName": "paidAmount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "SubscriptionStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING,CONFIRMED,CANCELLED"
+    }
+  ],
+  "name": "OneTimeEventSubscribers",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "oneTimeEvent",
+      "otherEntityRelationshipName": "oneTimeEventSubscribers",
+      "relationshipName": "oneTimeEvent",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "oneTimeEventSubscribers",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "service": "serviceClass"
+}

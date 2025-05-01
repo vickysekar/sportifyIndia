@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "changelogDate": "20250309100558"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "course",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sport",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "level",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "startTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "duration",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "imageLinks",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "CourseStatusEnum",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "UPCOMING,ONGOING,COMPLETED,CANCELLED"
+    },
+    {
+      "fieldName": "termsAndConditions",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Course",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "facility",
+      "otherEntityRelationshipName": "course",
+      "relationshipName": "facility",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "subscriptionPlan",
+      "otherEntityRelationshipName": "course",
+      "relationshipName": "subscriptionPlan",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}
