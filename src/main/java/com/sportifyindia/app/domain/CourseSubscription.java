@@ -43,15 +43,23 @@ public class CourseSubscription implements Serializable {
     private Integer remainingSessions;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "facility", "subscriptionPlans" }, allowSetters = true)
+    @JoinColumn(name = "course_id", nullable = false)
+    @JsonIgnoreProperties(value = { "subscriptionPlans" }, allowSetters = true)
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "authorities", "facility", "facilityEmployees" }, allowSetters = true)
+    @JoinColumn(name = "facility_id", nullable = false)
+    @JsonIgnoreProperties(value = { "courses" }, allowSetters = true)
+    private Facility facility;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties(value = { "authorities" }, allowSetters = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "course", "subscriptionAvailableDays" }, allowSetters = true)
+    @JoinColumn(name = "subscription_plan_id", nullable = false)
+    @JsonIgnoreProperties(value = { "course" }, allowSetters = true)
     private SubscriptionPlan subscriptionPlan;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -131,6 +139,19 @@ public class CourseSubscription implements Serializable {
 
     public CourseSubscription course(Course course) {
         this.setCourse(course);
+        return this;
+    }
+
+    public Facility getFacility() {
+        return this.facility;
+    }
+
+    public void setFacility(Facility facility) {
+        this.facility = facility;
+    }
+
+    public CourseSubscription facility(Facility facility) {
+        this.setFacility(facility);
         return this;
     }
 

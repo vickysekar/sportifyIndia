@@ -1,7 +1,7 @@
 package com.sportifyindia.app.service.dto;
 
 import com.sportifyindia.app.domain.enumeration.CourseSubscriptionStatusEnum;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -26,6 +26,8 @@ public class CourseSubscriptionDTO implements Serializable {
     private Integer remainingSessions;
 
     private CourseDTO course;
+
+    private FacilityDTO facility;
 
     private UserDTO user;
 
@@ -79,6 +81,14 @@ public class CourseSubscriptionDTO implements Serializable {
         this.course = course;
     }
 
+    public FacilityDTO getFacility() {
+        return facility;
+    }
+
+    public void setFacility(FacilityDTO facility) {
+        this.facility = facility;
+    }
+
     public UserDTO getUser() {
         return user;
     }
@@ -126,6 +136,7 @@ public class CourseSubscriptionDTO implements Serializable {
             ", status='" + getStatus() + "'" +
             ", remainingSessions=" + getRemainingSessions() +
             ", course=" + getCourse() +
+            ", facility=" + getFacility() +
             ", user=" + getUser() +
             ", subscriptionPlan=" + getSubscriptionPlan() +
             "}";
