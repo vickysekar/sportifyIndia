@@ -1,10 +1,10 @@
 package com.sportifyindia.app.service.dto;
 
-import com.sportifyindia.app.domain.enumeration.CourseStatusEnum;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.sportifyindia.app.domain.Course} entity.
@@ -14,34 +14,29 @@ public class CourseDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private String name;
 
-    @NotNull
     private String sport;
 
-    @NotNull
     private String level;
 
     private String description;
 
-    @NotNull
     private Instant startTime;
 
-    @NotNull
     private Instant endTime;
 
-    @NotNull
     private Integer duration;
 
     private String imageLinks;
 
-    @NotNull
-    private CourseStatusEnum status;
+    private String status;
 
     private String termsAndConditions;
 
-    private FacilityDTO facility;
+    private Long facilityId;
+
+    private Set<SubscriptionPlanDTO> subscriptionPlans = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -115,11 +110,11 @@ public class CourseDTO implements Serializable {
         this.imageLinks = imageLinks;
     }
 
-    public CourseStatusEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CourseStatusEnum status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -131,12 +126,20 @@ public class CourseDTO implements Serializable {
         this.termsAndConditions = termsAndConditions;
     }
 
-    public FacilityDTO getFacility() {
-        return facility;
+    public Long getFacilityId() {
+        return facilityId;
     }
 
-    public void setFacility(FacilityDTO facility) {
-        this.facility = facility;
+    public void setFacilityId(Long facilityId) {
+        this.facilityId = facilityId;
+    }
+
+    public Set<SubscriptionPlanDTO> getSubscriptionPlans() {
+        return subscriptionPlans;
+    }
+
+    public void setSubscriptionPlans(Set<SubscriptionPlanDTO> subscriptionPlans) {
+        this.subscriptionPlans = subscriptionPlans;
     }
 
     @Override
@@ -160,22 +163,44 @@ public class CourseDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "CourseDTO{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", sport='" + getSport() + "'" +
-            ", level='" + getLevel() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", startTime='" + getStartTime() + "'" +
-            ", endTime='" + getEndTime() + "'" +
-            ", duration=" + getDuration() +
-            ", imageLinks='" + getImageLinks() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", termsAndConditions='" + getTermsAndConditions() + "'" +
-            ", facility=" + getFacility() +
-            "}";
+        return (
+            "CourseDTO{" +
+            "id=" +
+            getId() +
+            ", name='" +
+            getName() +
+            "'" +
+            ", sport='" +
+            getSport() +
+            "'" +
+            ", level='" +
+            getLevel() +
+            "'" +
+            ", description='" +
+            getDescription() +
+            "'" +
+            ", startTime='" +
+            getStartTime() +
+            "'" +
+            ", endTime='" +
+            getEndTime() +
+            "'" +
+            ", duration=" +
+            getDuration() +
+            ", imageLinks='" +
+            getImageLinks() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", termsAndConditions='" +
+            getTermsAndConditions() +
+            "'" +
+            ", facilityId=" +
+            getFacilityId() +
+            "}"
+        );
     }
 }

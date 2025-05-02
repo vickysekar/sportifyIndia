@@ -29,7 +29,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link com.sportifyindia.app.domain.Course}.
  */
 @RestController
-@RequestMapping("/api/courses")
+@RequestMapping("/api")
 public class CourseResource {
 
     private final Logger log = LoggerFactory.getLogger(CourseResource.class);
@@ -55,7 +55,7 @@ public class CourseResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new courseDTO, or with status {@code 400 (Bad Request)} if the course has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/courses")
     public ResponseEntity<CourseDTO> createCourse(@Valid @RequestBody CourseDTO courseDTO) throws URISyntaxException {
         log.debug("REST request to save Course : {}", courseDTO);
         if (courseDTO.getId() != null) {
@@ -78,7 +78,7 @@ public class CourseResource {
      * or with status {@code 500 (Internal Server Error)} if the courseDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/courses/{id}")
     public ResponseEntity<CourseDTO> updateCourse(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CourseDTO courseDTO
@@ -113,7 +113,7 @@ public class CourseResource {
      * or with status {@code 500 (Internal Server Error)} if the courseDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/courses/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CourseDTO> partialUpdateCourse(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody CourseDTO courseDTO
@@ -144,7 +144,7 @@ public class CourseResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of courses in body.
      */
-    @GetMapping("")
+    @GetMapping("/courses")
     public ResponseEntity<List<CourseDTO>> getAllCourses(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Courses");
         Page<CourseDTO> page = courseService.findAll(pageable);
@@ -158,8 +158,8 @@ public class CourseResource {
      * @param id the id of the courseDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the courseDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<CourseDTO> getCourse(@PathVariable("id") Long id) {
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<CourseDTO> getCourse(@PathVariable Long id) {
         log.debug("REST request to get Course : {}", id);
         Optional<CourseDTO> courseDTO = courseService.findOne(id);
         return ResponseUtil.wrapOrNotFound(courseDTO);
@@ -171,8 +171,8 @@ public class CourseResource {
      * @param id the id of the courseDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable("id") Long id) {
+    @DeleteMapping("/courses/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         log.debug("REST request to delete Course : {}", id);
         courseService.delete(id);
         return ResponseEntity
@@ -202,5 +202,23 @@ public class CourseResource {
         } catch (RuntimeException e) {
             throw ElasticsearchExceptionMapper.mapException(e);
         }
+    }
+
+    /**
+     * {@code GET  /courses/facility/:facilityId} : get all courses by facility ID.
+     *
+     * @param facilityId the ID of the facility.
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of courses in body.
+     */
+    @GetMapping("/courses/facility/{facilityId}")
+    public ResponseEntity<List<CourseDTO>> getAllCoursesByFacilityId(
+        @PathVariable Long facilityId,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get a page of Courses for facility : {}", facilityId);
+        Page<CourseDTO> page = courseService.findAllByFacilityId(facilityId, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 }
