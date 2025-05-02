@@ -17,7 +17,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "utilityavailabledays")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class UtilityAvailableDays implements Serializable {
+public class UtilityAvailableDays extends AbstractAuditingEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
