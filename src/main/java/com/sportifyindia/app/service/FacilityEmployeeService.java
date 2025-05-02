@@ -118,6 +118,11 @@ public class FacilityEmployeeService {
 
         // Update user's role based on position
         User employee = employeeUser.get();
+
+        // Remove ROLE_USER if present
+        employee.getAuthorities().removeIf(auth -> auth.getName().equals("ROLE_USER"));
+
+        // Add the new role to user's authorities
         String newRole =
             switch (role) {
                 case FACILITY_ADMIN -> AuthoritiesConstants.FACILITY_ADMIN;
@@ -238,6 +243,11 @@ public class FacilityEmployeeService {
             };
 
         employeeUser.getAuthorities().removeIf(auth -> auth.getName().equals(roleToRemove));
+
+        // Add ROLE_USER back to the user's authorities
+        Authority userRole = new Authority();
+        userRole.setName("ROLE_USER");
+        employeeUser.getAuthorities().add(userRole);
 
         // Convert User to AdminUserDTO for update
         AdminUserDTO adminUserDTO = new AdminUserDTO(employeeUser);
