@@ -37,6 +37,9 @@ public class SubscriptionPlanDTO implements Serializable {
     private Integer sessionLimit;
 
     @NotNull
+    private Boolean isUnlimitedSessions;
+
+    @NotNull
     private SubscriptionPlanStatusEnum status;
 
     private CourseDTO course;
@@ -107,6 +110,14 @@ public class SubscriptionPlanDTO implements Serializable {
         this.sessionLimit = sessionLimit;
     }
 
+    public Boolean getIsUnlimitedSessions() {
+        return isUnlimitedSessions;
+    }
+
+    public void setIsUnlimitedSessions(Boolean isUnlimitedSessions) {
+        this.isUnlimitedSessions = isUnlimitedSessions;
+    }
+
     public SubscriptionPlanStatusEnum getStatus() {
         return status;
     }
@@ -164,6 +175,7 @@ public class SubscriptionPlanDTO implements Serializable {
             ", validityPeriod=" + getValidityPeriod() +
             ", noOfPauseDays=" + getNoOfPauseDays() +
             ", sessionLimit=" + getSessionLimit() +
+            ", isUnlimitedSessions='" + getIsUnlimitedSessions() + "'" +
             ", status='" + getStatus() + "'" +
             ", course=" + getCourse() +
             ", subscriptionAvailableDays=" + getSubscriptionAvailableDays() +

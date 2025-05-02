@@ -1,7 +1,10 @@
 package com.sportifyindia.app.repository;
 
 import com.sportifyindia.app.domain.TimeSlots;
-import org.springframework.data.jpa.repository.*;
+import java.time.Instant;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -9,4 +12,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface TimeSlotsRepository extends JpaRepository<TimeSlots, Long> {}
+public interface TimeSlotsRepository extends JpaRepository<TimeSlots, Long>, JpaSpecificationExecutor<TimeSlots> {
+    Optional<TimeSlots> findByStartTimeAndEndTime(Instant startTime, Instant endTime);
+}

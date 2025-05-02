@@ -11,11 +11,15 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface SubscriptionAvailableDayMapper extends EntityMapper<SubscriptionAvailableDayDTO, SubscriptionAvailableDay> {
-    @Mapping(target = "timeSlots", source = "timeSlots", qualifiedByName = "timeSlotsId")
+    @Mapping(target = "startTime", source = "timeSlots.startTime")
+    @Mapping(target = "endTime", source = "timeSlots.endTime")
     SubscriptionAvailableDayDTO toDto(SubscriptionAvailableDay s);
 
-    @Named("timeSlotsId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    TimeSlotsDTO toDtoTimeSlotsId(TimeSlots timeSlots);
+    @Mapping(target = "timeSlots", ignore = true)
+    SubscriptionAvailableDay toEntity(SubscriptionAvailableDayDTO s);
+
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "timeSlots", ignore = true)
+    void partialUpdate(@MappingTarget SubscriptionAvailableDay entity, SubscriptionAvailableDayDTO dto);
 }

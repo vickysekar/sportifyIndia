@@ -27,4 +27,23 @@ public interface SubscriptionPlanRepository extends SubscriptionPlanRepositoryWi
     default Page<SubscriptionPlan> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
     }
+
+    /**
+     * Find all subscription plans for a specific course.
+     *
+     * @param courseId the ID of the course
+     * @param pageable the pagination information
+     * @return the list of subscription plans for the course
+     */
+    Page<SubscriptionPlan> findByCourseId(Long courseId, Pageable pageable);
+
+    /**
+     * Find all subscription plans for a specific course with eager loaded relationships.
+     *
+     * @param courseId the ID of the course
+     * @param pageable the pagination information
+     * @return the list of subscription plans for the course with eager loaded relationships
+     */
+    @EntityGraph(attributePaths = { "subscriptionAvailableDays", "subscriptionAvailableDays.timeSlots" })
+    Page<SubscriptionPlan> findByCourseIdWithEagerRelationships(Long courseId, Pageable pageable);
 }

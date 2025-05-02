@@ -1,21 +1,19 @@
 package com.sportifyindia.app.service.dto;
 
-import jakarta.validation.constraints.*;
+import com.sportifyindia.app.domain.enumeration.DaysOfWeekEnum;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
  * A DTO for the {@link com.sportifyindia.app.domain.SubscriptionAvailableDay} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class SubscriptionAvailableDayDTO implements Serializable {
 
     private Long id;
-
-    @NotNull
-    private String daysOfWeek;
-
-    private TimeSlotsDTO timeSlots;
+    private DaysOfWeekEnum daysOfWeek;
+    private Instant startTime;
+    private Instant endTime;
 
     public Long getId() {
         return id;
@@ -25,20 +23,28 @@ public class SubscriptionAvailableDayDTO implements Serializable {
         this.id = id;
     }
 
-    public String getDaysOfWeek() {
+    public DaysOfWeekEnum getDaysOfWeek() {
         return daysOfWeek;
     }
 
-    public void setDaysOfWeek(String daysOfWeek) {
+    public void setDaysOfWeek(DaysOfWeekEnum daysOfWeek) {
         this.daysOfWeek = daysOfWeek;
     }
 
-    public TimeSlotsDTO getTimeSlots() {
-        return timeSlots;
+    public Instant getStartTime() {
+        return startTime;
     }
 
-    public void setTimeSlots(TimeSlotsDTO timeSlots) {
-        this.timeSlots = timeSlots;
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Instant getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
     }
 
     @Override
@@ -62,13 +68,22 @@ public class SubscriptionAvailableDayDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "SubscriptionAvailableDayDTO{" +
-            "id=" + getId() +
-            ", daysOfWeek='" + getDaysOfWeek() + "'" +
-            ", timeSlots=" + getTimeSlots() +
-            "}";
+        return (
+            "SubscriptionAvailableDayDTO{" +
+            "id=" +
+            getId() +
+            ", daysOfWeek='" +
+            getDaysOfWeek() +
+            "'" +
+            ", startTime='" +
+            getStartTime() +
+            "'" +
+            ", endTime='" +
+            getEndTime() +
+            "'" +
+            "}"
+        );
     }
 }

@@ -1,6 +1,5 @@
 package com.sportifyindia.app.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -8,15 +7,10 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.sportifyindia.app.domain.TimeSlots} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class TimeSlotsDTO implements Serializable {
 
     private Long id;
-
-    @NotNull
     private Instant startTime;
-
-    @NotNull
     private Instant endTime;
 
     public Long getId() {
