@@ -65,30 +65,84 @@ public class CourseService {
     }
 
     /**
-     * Update a course.
+     * Create a course for a specific facility.
+     * Only ROLE_OWNER and ROLE_ADMIN can create courses.
+     * For ROLE_OWNER, they must own the facility.
      *
-     * @param courseDTO the entity to update.
-     * @return the persisted entity.
+     * @param facilityId the ID of the facility
+     * @param courseDTO the course to create
+     * @return the persisted course
      */
+    @Transactional
+    public CourseDTO createCourseForFacility(Long facilityId, CourseDTO courseDTO) {
+        log.debug("Request to create Course for Facility {}: {}", facilityId, courseDTO);
+
+        // Check if user has access to the facility
+        checkUserHasAccess(facilityId);
+
+        // Find the facility
+        Facility facility = facilityRepository
+            .findById(facilityId)
+            .orElseThrow(() -> new IllegalArgumentException("Facility not found with id: " + facilityId));
+
+        Course course = courseMapper.toEntity(courseDTO);
+        course.setFacility(facility);
+
+        Course savedCourse = courseRepository.save(course);
+        CourseDTO result = courseMapper.toDto(savedCourse);
+        courseSearchRepository.index(savedCourse);
+
+        return result;
+    }
+
+    /**
+     * Update a course.
+     * Only ROLE_OWNER and ROLE_ADMIN can update courses.
+     * For ROLE_OWNER, they must own the facility.
+     *
+     * @param courseDTO the entity to update
+     * @return the persisted entity
+     */
+    @Transactional
     public CourseDTO update(CourseDTO courseDTO) {
         log.debug("Request to update Course : {}", courseDTO);
-        checkUserHasAccess(courseDTO.getFacilityId());
-        Course course = courseMapper.toEntity(courseDTO);
-        course = courseRepository.save(course);
-        CourseDTO result = courseMapper.toDto(course);
-        courseSearchRepository.index(course);
+
+        // Get the course to check facility ownership
+        Course course = courseRepository
+            .findById(courseDTO.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Course not found with id: " + courseDTO.getId()));
+
+        // Check if user has access to the facility
+        checkUserHasAccess(course.getFacility().getId());
+
+        Course updatedCourse = courseMapper.toEntity(courseDTO);
+        updatedCourse = courseRepository.save(updatedCourse);
+        CourseDTO result = courseMapper.toDto(updatedCourse);
+        courseSearchRepository.index(updatedCourse);
+
         return result;
     }
 
     /**
      * Partially update a course.
+     * Only ROLE_OWNER and ROLE_ADMIN can update courses.
+     * For ROLE_OWNER, they must own the facility.
      *
-     * @param courseDTO the entity to update partially.
-     * @return the persisted entity.
+     * @param courseDTO the entity to update partially
+     * @return the persisted entity
      */
+    @Transactional
     public Optional<CourseDTO> partialUpdate(CourseDTO courseDTO) {
         log.debug("Request to partially update Course : {}", courseDTO);
-        checkUserHasAccess(courseDTO.getFacilityId());
+
+        // Get the course to check facility ownership
+        Course course = courseRepository
+            .findById(courseDTO.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Course not found with id: " + courseDTO.getId()));
+
+        // Check if user has access to the facility
+        checkUserHasAccess(course.getFacility().getId());
+
         return courseRepository
             .findById(courseDTO.getId())
             .map(existingCourse -> {
@@ -104,27 +158,6 @@ public class CourseService {
     }
 
     /**
-     * Get all the courses.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public Page<CourseDTO> findAll(Pageable pageable) {
-        log.debug("Request to get all Courses");
-        return courseRepository.findAll(pageable).map(courseMapper::toDto);
-    }
-
-    /**
-     * Get all the courses with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<CourseDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return courseRepository.findAllWithEagerRelationships(pageable).map(courseMapper::toDto);
-    }
-
-    /**
      * Get one course by id.
      *
      * @param id the id of the entity.
@@ -137,18 +170,24 @@ public class CourseService {
     }
 
     /**
-     * Delete the course by id.
+     * Delete the course by ID.
+     * Only ROLE_OWNER and ROLE_ADMIN can delete courses.
+     * For ROLE_OWNER, they must own the facility.
      *
-     * @param id the id of the entity.
+     * @param id the ID of the course
      */
+    @Transactional
     public void delete(Long id) {
         log.debug("Request to delete Course : {}", id);
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
-            checkUserHasAccess(course.get().getFacility().getId());
-            courseRepository.deleteById(id);
-            courseSearchRepository.deleteFromIndexById(id);
-        }
+
+        // Get the course to check facility ownership
+        Course course = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course not found with id: " + id));
+
+        // Check if user has access to the facility
+        checkUserHasAccess(course.getFacility().getId());
+
+        courseRepository.deleteById(id);
+        courseSearchRepository.deleteFromIndexById(id);
     }
 
     /**
@@ -177,21 +216,41 @@ public class CourseService {
         return courseRepository.findByFacilityId(facilityId, pageable).map(courseMapper::toDto);
     }
 
+    /**
+     * Check if the current user has access to the facility.
+     * Only ROLE_OWNER and ROLE_ADMIN can access the facility.
+     *
+     * @param facilityId the ID of the facility
+     */
     private void checkUserHasAccess(Long facilityId) {
-        Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().orElse(""));
-        if (user.isPresent()) {
-            Optional<Facility> facility = facilityRepository.findById(facilityId);
-            if (facility.isPresent()) {
-                if (
-                    !user
-                        .get()
-                        .getAuthorities()
-                        .stream()
-                        .anyMatch(auth -> auth.getName().equals("ROLE_OWNER") || auth.getName().equals("ROLE_ADMIN"))
-                ) {
-                    throw new RuntimeException("User does not have permission to perform this action");
-                }
+        String currentUserLogin = SecurityUtils
+            .getCurrentUserLogin()
+            .orElseThrow(() -> new IllegalArgumentException("Current user login not found"));
+
+        User currentUser = userRepository
+            .findOneByLogin(currentUserLogin)
+            .orElseThrow(() -> new IllegalArgumentException("User not found with login: " + currentUserLogin));
+
+        // Check if user is ROLE_ADMIN
+        boolean isAdmin = currentUser.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return;
+        }
+
+        // Check if user is ROLE_OWNER and owns the facility
+        boolean isOwner = currentUser.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_OWNER"));
+
+        if (isOwner) {
+            Facility facility = facilityRepository
+                .findById(facilityId)
+                .orElseThrow(() -> new IllegalArgumentException("Facility not found with id: " + facilityId));
+
+            if (facility.getUser().getId().equals(currentUser.getId())) {
+                return;
             }
         }
+
+        throw new IllegalArgumentException("User does not have permission to perform this action");
     }
 }

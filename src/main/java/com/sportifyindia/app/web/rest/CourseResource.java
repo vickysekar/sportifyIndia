@@ -49,19 +49,25 @@ public class CourseResource {
     }
 
     /**
-     * {@code POST  /courses} : Create a new course.
+     * {@code POST  /courses/facility/{facilityId}} : Create a new course for a facility.
+     * Only ROLE_OWNER and ROLE_ADMIN can create courses.
+     * For ROLE_OWNER, they must own the facility.
      *
+     * @param facilityId the ID of the facility
      * @param courseDTO the courseDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new courseDTO, or with status {@code 400 (Bad Request)} if the course has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new courseDTO,
+     * or with status {@code 400 (Bad Request)} if the course has already an ID,
+     * or with status {@code 403 (Forbidden)} if the user doesn't have permission.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/courses")
-    public ResponseEntity<CourseDTO> createCourse(@Valid @RequestBody CourseDTO courseDTO) throws URISyntaxException {
-        log.debug("REST request to save Course : {}", courseDTO);
+    @PostMapping("/courses/facility/{facilityId}")
+    public ResponseEntity<CourseDTO> createCourseForFacility(@PathVariable Long facilityId, @Valid @RequestBody CourseDTO courseDTO)
+        throws URISyntaxException {
+        log.debug("REST request to save Course for Facility {}: {}", facilityId, courseDTO);
         if (courseDTO.getId() != null) {
             throw new BadRequestAlertException("A new course cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        CourseDTO result = courseService.save(courseDTO);
+        CourseDTO result = courseService.createCourseForFacility(facilityId, courseDTO);
         return ResponseEntity
             .created(new URI("/api/courses/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -70,19 +76,21 @@ public class CourseResource {
 
     /**
      * {@code PUT  /courses/:id} : Updates an existing course.
+     * Only ROLE_OWNER and ROLE_ADMIN can update courses.
+     * For ROLE_OWNER, they must own the facility.
      *
      * @param id the id of the courseDTO to save.
      * @param courseDTO the courseDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated courseDTO,
      * or with status {@code 400 (Bad Request)} if the courseDTO is not valid,
+     * or with status {@code 403 (Forbidden)} if the user doesn't have permission,
      * or with status {@code 500 (Internal Server Error)} if the courseDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/courses/{id}")
     public ResponseEntity<CourseDTO> updateCourse(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CourseDTO courseDTO
-    ) throws URISyntaxException {
+    ) {
         log.debug("REST request to update Course : {}, {}", id, courseDTO);
         if (courseDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -95,23 +103,29 @@ public class CourseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        CourseDTO result = courseService.update(courseDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, courseDTO.getId().toString()))
-            .body(result);
+        try {
+            CourseDTO result = courseService.update(courseDTO);
+            return ResponseEntity
+                .ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, courseDTO.getId().toString()))
+                .body(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(403).build();
+        }
     }
 
     /**
      * {@code PATCH  /courses/:id} : Partial updates given fields of an existing course, field will ignore if it is null
+     * Only ROLE_OWNER and ROLE_ADMIN can update courses.
+     * For ROLE_OWNER, they must own the facility.
      *
      * @param id the id of the courseDTO to save.
      * @param courseDTO the courseDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated courseDTO,
      * or with status {@code 400 (Bad Request)} if the courseDTO is not valid,
+     * or with status {@code 403 (Forbidden)} if the user doesn't have permission,
      * or with status {@code 404 (Not Found)} if the courseDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the courseDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/courses/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CourseDTO> partialUpdateCourse(
@@ -130,26 +144,15 @@ public class CourseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<CourseDTO> result = courseService.partialUpdate(courseDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, courseDTO.getId().toString())
-        );
-    }
-
-    /**
-     * {@code GET  /courses} : get all the courses.
-     *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of courses in body.
-     */
-    @GetMapping("/courses")
-    public ResponseEntity<List<CourseDTO>> getAllCourses(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Courses");
-        Page<CourseDTO> page = courseService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        try {
+            Optional<CourseDTO> result = courseService.partialUpdate(courseDTO);
+            return ResponseUtil.wrapOrNotFound(
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, courseDTO.getId().toString())
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(403).build();
+        }
     }
 
     /**
@@ -166,19 +169,30 @@ public class CourseResource {
     }
 
     /**
-     * {@code DELETE  /courses/:id} : delete the "id" course.
+     * {@code DELETE  /courses/:id} : delete the course by ID.
+     * Only ROLE_OWNER and ROLE_ADMIN can delete courses.
+     * For ROLE_OWNER, they must own the facility.
      *
-     * @param id the id of the courseDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * @param id the ID of the course to delete
+     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)} if successful,
+     * or with status {@code 403 (Forbidden)} if the user doesn't have permission,
+     * or with status {@code 404 (Not Found)} if the course doesn't exist
      */
     @DeleteMapping("/courses/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         log.debug("REST request to delete Course : {}", id);
-        courseService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        try {
+            courseService.delete(id);
+            return ResponseEntity
+                .noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                .build();
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.status(403).build();
+        }
     }
 
     /**
