@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -29,6 +30,9 @@ public class OneTimeEventSubscribers extends AbstractAuditingEntity<Long> implem
     @NotNull
     @Column(name = "paid_amount", precision = 21, scale = 2, nullable = false)
     private BigDecimal paidAmount;
+
+    @Column(name = "event_date")
+    private LocalDate eventDate;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -69,6 +73,19 @@ public class OneTimeEventSubscribers extends AbstractAuditingEntity<Long> implem
 
     public void setPaidAmount(BigDecimal paidAmount) {
         this.paidAmount = paidAmount;
+    }
+
+    public LocalDate getEventDate() {
+        return this.eventDate;
+    }
+
+    public OneTimeEventSubscribers eventDate(LocalDate eventDate) {
+        this.setEventDate(eventDate);
+        return this;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
     }
 
     public SubscriptionStatusEnum getStatus() {
@@ -135,6 +152,7 @@ public class OneTimeEventSubscribers extends AbstractAuditingEntity<Long> implem
         return "OneTimeEventSubscribers{" +
             "id=" + getId() +
             ", paidAmount=" + getPaidAmount() +
+            ", eventDate='" + getEventDate() + "'" +
             ", status='" + getStatus() + "'" +
             "}";
     }

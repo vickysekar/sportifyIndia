@@ -2,15 +2,14 @@ package com.sportifyindia.app.service;
 
 import com.sportifyindia.app.domain.Facility;
 import com.sportifyindia.app.domain.OneTimeEvent;
-import com.sportifyindia.app.domain.User;
 import com.sportifyindia.app.domain.enumeration.EventStatusEnum;
 import com.sportifyindia.app.repository.FacilityRepository;
 import com.sportifyindia.app.repository.OneTimeEventRepository;
-import com.sportifyindia.app.repository.UserRepository;
 import com.sportifyindia.app.repository.search.OneTimeEventSearchRepository;
 import com.sportifyindia.app.security.SecurityUtils;
 import com.sportifyindia.app.service.dto.OneTimeEventDTO;
 import com.sportifyindia.app.service.mapper.OneTimeEventMapper;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -34,20 +33,17 @@ public class OneTimeEventService {
     private final OneTimeEventMapper oneTimeEventMapper;
     private final OneTimeEventSearchRepository oneTimeEventSearchRepository;
     private final FacilityRepository facilityRepository;
-    private final UserRepository userRepository;
 
     public OneTimeEventService(
         OneTimeEventRepository oneTimeEventRepository,
         OneTimeEventMapper oneTimeEventMapper,
         OneTimeEventSearchRepository oneTimeEventSearchRepository,
-        FacilityRepository facilityRepository,
-        UserRepository userRepository
+        FacilityRepository facilityRepository
     ) {
         this.oneTimeEventRepository = oneTimeEventRepository;
         this.oneTimeEventMapper = oneTimeEventMapper;
         this.oneTimeEventSearchRepository = oneTimeEventSearchRepository;
         this.facilityRepository = facilityRepository;
-        this.userRepository = userRepository;
     }
 
     /**
@@ -265,46 +261,7 @@ public class OneTimeEventService {
     }
 
     /**
-     * Check if the current user has access to the facility.
-     * Only ROLE_OWNER and ROLE_ADMIN can access the facility.
-     *
-     * @param facilityId the ID of the facility
-     */
-    private void checkUserHasAccess(Long facilityId) {
-        String currentUserLogin = SecurityUtils
-            .getCurrentUserLogin()
-            .orElseThrow(() -> new IllegalArgumentException("Current user login not found"));
-
-        User currentUser = userRepository
-            .findOneByLogin(currentUserLogin)
-            .orElseThrow(() -> new IllegalArgumentException("User not found with login: " + currentUserLogin));
-
-        // Check if user is ROLE_ADMIN
-        boolean isAdmin = currentUser.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_ADMIN"));
-
-        if (isAdmin) {
-            return;
-        }
-
-        // Check if user is ROLE_OWNER and owns the facility
-        boolean isOwner = currentUser.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_OWNER"));
-
-        if (isOwner) {
-            Facility facility = facilityRepository
-                .findById(facilityId)
-                .orElseThrow(() -> new IllegalArgumentException("Facility not found with id: " + facilityId));
-
-            if (facility.getUser().getId().equals(currentUser.getId())) {
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException("User does not have permission to perform this action");
-    }
-
-    /**
-     * Update status of all events that have expired (event date is before today) to COMPLETED.
-     * This method should be called by a scheduler at the start of each day.
+     * Update the status of expired events to COMPLETED.
      */
     @Transactional
     public void updateExpiredEventsStatus() {
@@ -320,5 +277,27 @@ public class OneTimeEventService {
         }
 
         log.debug("Completed updating status of {} expired events", expiredEvents.size());
+    }
+
+    /**
+     * Check if the current user has access to the facility.
+     * Only ROLE_OWNER and ROLE_ADMIN can access.
+     * For ROLE_OWNER, they must own the facility.
+     *
+     * @param facilityId the ID of the facility
+     * @throws IllegalArgumentException if the user doesn't have access
+     */
+    private void checkUserHasAccess(Long facilityId) {
+        if (!SecurityUtils.hasCurrentUserThisAuthority("ROLE_ADMIN")) {
+            if (!SecurityUtils.hasCurrentUserThisAuthority("ROLE_OWNER")) {
+                throw new IllegalArgumentException("User doesn't have permission to manage events");
+            }
+
+            // For ROLE_OWNER, check if they own the facility
+            Optional<Facility> facility = facilityRepository.findById(facilityId);
+            if (facility.isEmpty() || !facility.get().getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().get())) {
+                throw new IllegalArgumentException("User doesn't own the facility");
+            }
+        }
     }
 }
