@@ -336,4 +336,16 @@ public class UserService {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
     }
+
+    /**
+     * Get a user by ID.
+     *
+     * @param id the ID of the user to find.
+     * @return the user if found, empty otherwise.
+     */
+    @Transactional(readOnly = true)
+    public Optional<User> findOne(Long id) {
+        log.debug("Request to get User : {}", id);
+        return userRepository.findById(id);
+    }
 }

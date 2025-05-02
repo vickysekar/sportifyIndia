@@ -1,7 +1,11 @@
 package com.sportifyindia.app.service;
 
+import com.sportifyindia.app.domain.CourseSubscription;
 import com.sportifyindia.app.domain.Facility;
 import com.sportifyindia.app.domain.User;
+import com.sportifyindia.app.domain.enumeration.EmployeeRoleEnum;
+import com.sportifyindia.app.domain.enumeration.EmployeeStatusEnum;
+import com.sportifyindia.app.repository.CourseSubscriptionRepository;
 import com.sportifyindia.app.repository.FacilityRepository;
 import com.sportifyindia.app.repository.search.FacilitySearchRepository;
 import com.sportifyindia.app.security.AuthoritiesConstants;
@@ -30,23 +34,23 @@ public class FacilityService {
     private final Logger log = LoggerFactory.getLogger(FacilityService.class);
 
     private final FacilityRepository facilityRepository;
-
     private final FacilityMapper facilityMapper;
-
     private final FacilitySearchRepository facilitySearchRepository;
-
     private final UserService userService;
+    private final CourseSubscriptionRepository courseSubscriptionRepository;
 
     public FacilityService(
         FacilityRepository facilityRepository,
         FacilityMapper facilityMapper,
         FacilitySearchRepository facilitySearchRepository,
-        UserService userService
+        UserService userService,
+        CourseSubscriptionRepository courseSubscriptionRepository
     ) {
         this.facilityRepository = facilityRepository;
         this.facilityMapper = facilityMapper;
         this.facilitySearchRepository = facilitySearchRepository;
         this.userService = userService;
+        this.courseSubscriptionRepository = courseSubscriptionRepository;
     }
 
     /**
@@ -156,19 +160,71 @@ public class FacilityService {
     }
 
     /**
-     * Get all the facilities for the current owner.
+     * Get all facilities based on user role and subscriptions.
+     * For ROLE_USER: returns only facilities where user has active course subscriptions
+     * For ROLE_FACILITY_OWNER: returns only the facility where user is the owner
+     * For ROLE_FACILITY_ADMIN: returns only the facility where user is an admin
+     * For ROLE_TRAINER: returns only the facility where user is a trainer
+     * For ROLE_SALES_PERSON: returns only the facility where user is a sales person
+     * For other roles: returns all facilities
      *
      * @param pageable the pagination information.
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<FacilityDTO> findAllForCurrentOwner(Pageable pageable) {
-        log.debug("Request to get all Facilities for current owner");
+    public Page<FacilityDTO> findAllForCurrentUser(Pageable pageable) {
+        log.debug("Request to get all Facilities for current user");
         Optional<User> currentUser = userService.getUserWithAuthorities();
+
         if (currentUser.isEmpty()) {
+            log.error("No authenticated user found");
             throw new RuntimeException("User not found");
         }
-        return facilityRepository.findByUserIsCurrentUser(pageable).map(facilityMapper::toDto);
+
+        User user = currentUser.get();
+        String username = user.getLogin();
+        List<String> roles = user.getAuthorities().stream().map(auth -> auth.getName()).collect(Collectors.toList());
+        log.debug("Processing request for user: {} with roles: {}", username, roles);
+
+        // Check if user is a facility owner
+        if (roles.contains("ROLE_FACILITY_OWNER")) {
+            log.debug("User {} is a facility owner, returning owned facilities", username);
+            return facilityRepository.findByUserIsCurrentUser(pageable).map(facilityMapper::toDto);
+        }
+
+        // Check if user is a facility admin
+        if (roles.contains("ROLE_FACILITY_ADMIN")) {
+            log.debug("User {} is a facility admin, returning managed facilities", username);
+            return facilityRepository
+                .findByEmployeeRole(user.getId(), EmployeeRoleEnum.FACILITY_ADMIN, EmployeeStatusEnum.ACTIVE, pageable)
+                .map(facilityMapper::toDto);
+        }
+
+        // Check if user is a trainer
+        if (roles.contains("ROLE_TRAINER")) {
+            log.debug("User {} is a trainer, returning associated facilities", username);
+            return facilityRepository
+                .findByEmployeeRole(user.getId(), EmployeeRoleEnum.TRAINER, EmployeeStatusEnum.ACTIVE, pageable)
+                .map(facilityMapper::toDto);
+        }
+
+        // Check if user is a sales person
+        if (roles.contains("ROLE_SALES_PERSON")) {
+            log.debug("User {} is a sales person, returning associated facilities", username);
+            return facilityRepository
+                .findByEmployeeRole(user.getId(), EmployeeRoleEnum.SALES_PERSON, EmployeeStatusEnum.ACTIVE, pageable)
+                .map(facilityMapper::toDto);
+        }
+
+        // Check if user is a regular user (ROLE_USER)
+        if (roles.contains("ROLE_USER")) {
+            log.debug("User {} is a regular user, returning facilities with active subscriptions", username);
+            return facilityRepository.findByUserSubscriptions(pageable).map(facilityMapper::toDto);
+        }
+
+        // For other roles (like ADMIN), return all facilities
+        log.debug("User {} has admin privileges, returning all facilities", username);
+        return facilityRepository.findAll(pageable).map(facilityMapper::toDto);
     }
 
     /**
@@ -181,20 +237,6 @@ public class FacilityService {
     public Page<FacilityDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Facilities");
         return facilityRepository.findAll(pageable).map(facilityMapper::toDto);
-    }
-
-    /**
-     *  Get all the facilities where Address is {@code null}.
-     *  @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<FacilityDTO> findAllWhereAddressIsNull() {
-        log.debug("Request to get all facilities where Address is null");
-        return StreamSupport
-            .stream(facilityRepository.findAll().spliterator(), false)
-            .filter(facility -> facility.getAddress() == null)
-            .map(facilityMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**

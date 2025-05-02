@@ -1,5 +1,8 @@
 package com.sportifyindia.app.web.rest;
 
+import com.sportifyindia.app.domain.Facility;
+import com.sportifyindia.app.domain.FacilityEmployee;
+import com.sportifyindia.app.domain.enumeration.EmployeeRoleEnum;
 import com.sportifyindia.app.repository.FacilityRepository;
 import com.sportifyindia.app.service.FacilityService;
 import com.sportifyindia.app.service.dto.FacilityDTO;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -30,7 +34,8 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link com.sportifyindia.app.domain.Facility}.
  */
 @RestController
-@RequestMapping("/api/facilities")
+@RequestMapping("/api")
+@Transactional
 public class FacilityResource {
 
     private final Logger log = LoggerFactory.getLogger(FacilityResource.class);
@@ -56,7 +61,7 @@ public class FacilityResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new facilityDTO, or with status {@code 400 (Bad Request)} if the facility has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/facilities")
     public ResponseEntity<FacilityDTO> createFacility(@Valid @RequestBody FacilityDTO facilityDTO) throws URISyntaxException {
         log.debug("REST request to save Facility : {}", facilityDTO);
         if (facilityDTO.getId() != null) {
@@ -79,7 +84,7 @@ public class FacilityResource {
      * or with status {@code 500 (Internal Server Error)} if the facilityDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/facilities/{id}")
     public ResponseEntity<FacilityDTO> updateFacility(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody FacilityDTO facilityDTO
@@ -114,7 +119,7 @@ public class FacilityResource {
      * or with status {@code 500 (Internal Server Error)} if the facilityDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/facilities/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<FacilityDTO> partialUpdateFacility(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody FacilityDTO facilityDTO
@@ -140,23 +145,18 @@ public class FacilityResource {
     }
 
     /**
-     * {@code GET  /facilities} : get all the facilities.
+     * {@code GET  /facilities} : get all the facilities based on user role and subscriptions.
+     * For ROLE_USER: returns only facilities where user has active course subscriptions
+     * For FACILITY_EMPLOYEE: returns only the facility where user is employed
+     * For other roles: returns all facilities
      *
      * @param pageable the pagination information.
-     * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of facilities in body.
      */
-    @GetMapping("")
-    public ResponseEntity<List<FacilityDTO>> getAllFacilities(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "filter", required = false) String filter
-    ) {
-        if ("address-is-null".equals(filter)) {
-            log.debug("REST request to get all Facilitys where address is null");
-            return new ResponseEntity<>(facilityService.findAllWhereAddressIsNull(), HttpStatus.OK);
-        }
-        log.debug("REST request to get a page of Facilities");
-        Page<FacilityDTO> page = facilityService.findAll(pageable);
+    @GetMapping("/facilities")
+    public ResponseEntity<List<FacilityDTO>> getAllFacilitiesForCurrentUser(Pageable pageable) {
+        log.debug("REST request to get a page of Facilities for current user");
+        Page<FacilityDTO> page = facilityService.findAllForCurrentUser(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -167,7 +167,7 @@ public class FacilityResource {
      * @param id the id of the facilityDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the facilityDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/facilities/{id}")
     public ResponseEntity<FacilityDTO> getFacility(@PathVariable("id") Long id) {
         log.debug("REST request to get Facility : {}", id);
         Optional<FacilityDTO> facilityDTO = facilityService.findOne(id);
@@ -180,7 +180,7 @@ public class FacilityResource {
      * @param id the id of the facilityDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/facilities/{id}")
     public ResponseEntity<Void> deleteFacility(@PathVariable("id") Long id) {
         log.debug("REST request to delete Facility : {}", id);
         facilityService.delete(id);
@@ -191,14 +191,13 @@ public class FacilityResource {
     }
 
     /**
-     * {@code SEARCH  /facilities/_search?query=:query} : search for the facility corresponding
-     * to the query.
+     * {@code GET  /facilities/_search} : Search for facilities.
      *
-     * @param query the query of the facility search.
+     * @param query the query of the search.
      * @param pageable the pagination information.
      * @return the result of the search.
      */
-    @GetMapping("/_search")
+    @GetMapping("/facilities/_search")
     public ResponseEntity<List<FacilityDTO>> searchFacilities(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable

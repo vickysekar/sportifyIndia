@@ -46,11 +46,16 @@ public class FacilityEmployee implements Serializable {
     private EmployeeRoleEnum role;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "facility_id", nullable = false)
     @JsonIgnoreProperties(
         value = { "user", "address", "facilityEmployees", "courses", "oneTimeEvents", "utilities", "saleLeads", "taxMasters", "discounts" },
         allowSetters = true
     )
     private Facility facility;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "facilityEmployee")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -128,6 +133,19 @@ public class FacilityEmployee implements Serializable {
 
     public FacilityEmployee facility(Facility facility) {
         this.setFacility(facility);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public FacilityEmployee user(User user) {
+        this.setUser(user);
         return this;
     }
 

@@ -1,10 +1,10 @@
 package com.sportifyindia.app.web.rest;
 
-import com.sportifyindia.app.repository.FacilityEmployeeRepository;
+import com.sportifyindia.app.domain.FacilityEmployee;
+import com.sportifyindia.app.domain.enumeration.EmployeeRoleEnum;
 import com.sportifyindia.app.service.FacilityEmployeeService;
 import com.sportifyindia.app.service.dto.FacilityEmployeeDTO;
-import com.sportifyindia.app.web.rest.errors.BadRequestAlertException;
-import com.sportifyindia.app.web.rest.errors.ElasticsearchExceptionMapper;
+import com.sportifyindia.app.service.mapper.FacilityEmployeeMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -26,10 +26,10 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.sportifyindia.app.domain.FacilityEmployee}.
+ * REST controller for managing facility employees.
  */
 @RestController
-@RequestMapping("/api/facility-employees")
+@RequestMapping("/api")
 public class FacilityEmployeeResource {
 
     private final Logger log = LoggerFactory.getLogger(FacilityEmployeeResource.class);
@@ -40,173 +40,203 @@ public class FacilityEmployeeResource {
     private String applicationName;
 
     private final FacilityEmployeeService facilityEmployeeService;
+    private final FacilityEmployeeMapper facilityEmployeeMapper;
 
-    private final FacilityEmployeeRepository facilityEmployeeRepository;
-
-    public FacilityEmployeeResource(
-        FacilityEmployeeService facilityEmployeeService,
-        FacilityEmployeeRepository facilityEmployeeRepository
-    ) {
+    public FacilityEmployeeResource(FacilityEmployeeService facilityEmployeeService, FacilityEmployeeMapper facilityEmployeeMapper) {
         this.facilityEmployeeService = facilityEmployeeService;
-        this.facilityEmployeeRepository = facilityEmployeeRepository;
+        this.facilityEmployeeMapper = facilityEmployeeMapper;
     }
 
     /**
-     * {@code POST  /facility-employees} : Create a new facilityEmployee.
+     * {@code POST  /facilities/{facilityId}/employees} : Add a new employee to a facility.
      *
-     * @param facilityEmployeeDTO the facilityEmployeeDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new facilityEmployeeDTO, or with status {@code 400 (Bad Request)} if the facilityEmployee has already an ID.
+     * @param facilityId the ID of the facility
+     * @param request the request containing employee details
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new facility employee,
+     * or with status {@code 400 (Bad Request)} if the employee already exists or if the request is invalid.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
-    public ResponseEntity<FacilityEmployeeDTO> createFacilityEmployee(@Valid @RequestBody FacilityEmployeeDTO facilityEmployeeDTO)
-        throws URISyntaxException {
-        log.debug("REST request to save FacilityEmployee : {}", facilityEmployeeDTO);
-        if (facilityEmployeeDTO.getId() != null) {
-            throw new BadRequestAlertException("A new facilityEmployee cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        FacilityEmployeeDTO result = facilityEmployeeService.save(facilityEmployeeDTO);
-        return ResponseEntity
-            .created(new URI("/api/facility-employees/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
-    }
-
-    /**
-     * {@code PUT  /facility-employees/:id} : Updates an existing facilityEmployee.
-     *
-     * @param id the id of the facilityEmployeeDTO to save.
-     * @param facilityEmployeeDTO the facilityEmployeeDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated facilityEmployeeDTO,
-     * or with status {@code 400 (Bad Request)} if the facilityEmployeeDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the facilityEmployeeDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<FacilityEmployeeDTO> updateFacilityEmployee(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody FacilityEmployeeDTO facilityEmployeeDTO
+    @PostMapping("/facilities/{facilityId}/employees")
+    public ResponseEntity<FacilityEmployeeDTO> addEmployeeToFacility(
+        @PathVariable Long facilityId,
+        @Valid @RequestBody AddEmployeeRequest request
     ) throws URISyntaxException {
-        log.debug("REST request to update FacilityEmployee : {}, {}", id, facilityEmployeeDTO);
-        if (facilityEmployeeDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, facilityEmployeeDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
+        log.debug("REST request to add employee to facility : {} with request: {}", facilityId, request);
 
-        if (!facilityEmployeeRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        try {
+            FacilityEmployee employee = facilityEmployeeService.addEmployeeToFacility(
+                facilityId,
+                request.getUserId(),
+                request.getRole(),
+                request.getPosition()
+            );
 
-        FacilityEmployeeDTO result = facilityEmployeeService.update(facilityEmployeeDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, facilityEmployeeDTO.getId().toString()))
-            .body(result);
+            FacilityEmployeeDTO result = facilityEmployeeMapper.toDto(employee);
+            return ResponseEntity
+                .created(new URI("/api/facilities/" + facilityId + "/employees/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .badRequest()
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "error", e.getMessage()))
+                .build();
+        }
     }
 
     /**
-     * {@code PATCH  /facility-employees/:id} : Partial updates given fields of an existing facilityEmployee, field will ignore if it is null
+     * {@code GET  /facilities/{facilityId}/employees} : Get all employees for a facility.
      *
-     * @param id the id of the facilityEmployeeDTO to save.
-     * @param facilityEmployeeDTO the facilityEmployeeDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated facilityEmployeeDTO,
-     * or with status {@code 400 (Bad Request)} if the facilityEmployeeDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the facilityEmployeeDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the facilityEmployeeDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @param facilityId the ID of the facility
+     * @param pageable the pagination information
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of employees in body.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<FacilityEmployeeDTO> partialUpdateFacilityEmployee(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody FacilityEmployeeDTO facilityEmployeeDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update FacilityEmployee partially : {}, {}", id, facilityEmployeeDTO);
-        if (facilityEmployeeDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, facilityEmployeeDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!facilityEmployeeRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<FacilityEmployeeDTO> result = facilityEmployeeService.partialUpdate(facilityEmployeeDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, facilityEmployeeDTO.getId().toString())
-        );
-    }
-
-    /**
-     * {@code GET  /facility-employees} : get all the facilityEmployees.
-     *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of facilityEmployees in body.
-     */
-    @GetMapping("")
-    public ResponseEntity<List<FacilityEmployeeDTO>> getAllFacilityEmployees(
+    @GetMapping("/facilities/{facilityId}/employees")
+    public ResponseEntity<List<FacilityEmployeeDTO>> getAllEmployeesForFacility(
+        @PathVariable Long facilityId,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of FacilityEmployees");
-        Page<FacilityEmployeeDTO> page = facilityEmployeeService.findAll(pageable);
+        log.debug("REST request to get all employees for facility : {}", facilityId);
+        Page<FacilityEmployeeDTO> page = facilityEmployeeService.findAllEmployeesForFacility(facilityId, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * {@code GET  /facility-employees/:id} : get the "id" facilityEmployee.
+     * {@code GET  /facilities/{facilityId}/employees/{id}} : Get an employee by ID.
      *
-     * @param id the id of the facilityEmployeeDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the facilityEmployeeDTO, or with status {@code 404 (Not Found)}.
+     * @param facilityId the ID of the facility
+     * @param id the ID of the employee
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the employee,
+     * or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<FacilityEmployeeDTO> getFacilityEmployee(@PathVariable("id") Long id) {
-        log.debug("REST request to get FacilityEmployee : {}", id);
-        Optional<FacilityEmployeeDTO> facilityEmployeeDTO = facilityEmployeeService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(facilityEmployeeDTO);
+    @GetMapping("/facilities/{facilityId}/employees/{id}")
+    public ResponseEntity<FacilityEmployeeDTO> getEmployee(@PathVariable Long facilityId, @PathVariable Long id) {
+        log.debug("REST request to get employee : {} for facility : {}", id, facilityId);
+        Optional<FacilityEmployeeDTO> employee = facilityEmployeeService.findEmployeeById(facilityId, id);
+        return ResponseUtil.wrapOrNotFound(employee);
     }
 
     /**
-     * {@code DELETE  /facility-employees/:id} : delete the "id" facilityEmployee.
+     * {@code DELETE  /facilities/{facilityId}/employees/{id}} : Remove an employee from a facility.
      *
-     * @param id the id of the facilityEmployeeDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * @param facilityId the ID of the facility
+     * @param id the ID of the employee to remove
+     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)} on success,
+     * or with status {@code 400 (Bad Request)} if the employee cannot be removed.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFacilityEmployee(@PathVariable("id") Long id) {
-        log.debug("REST request to delete FacilityEmployee : {}", id);
-        facilityEmployeeService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
-    }
-
-    /**
-     * {@code SEARCH  /facility-employees/_search?query=:query} : search for the facilityEmployee corresponding
-     * to the query.
-     *
-     * @param query the query of the facilityEmployee search.
-     * @param pageable the pagination information.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search")
-    public ResponseEntity<List<FacilityEmployeeDTO>> searchFacilityEmployees(
-        @RequestParam("query") String query,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
-    ) {
-        log.debug("REST request to search for a page of FacilityEmployees for query {}", query);
+    @DeleteMapping("/facilities/{facilityId}/employees/{id}")
+    public ResponseEntity<Void> removeEmployeeFromFacility(@PathVariable Long facilityId, @PathVariable Long id) {
+        log.debug("REST request to remove employee : {} from facility : {}", id, facilityId);
         try {
-            Page<FacilityEmployeeDTO> page = facilityEmployeeService.search(query, pageable);
-            HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-            return ResponseEntity.ok().headers(headers).body(page.getContent());
+            facilityEmployeeService.removeEmployeeFromFacility(facilityId, id);
+            return ResponseEntity
+                .noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                .build();
         } catch (RuntimeException e) {
-            throw ElasticsearchExceptionMapper.mapException(e);
+            return ResponseEntity
+                .badRequest()
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "error", e.getMessage()))
+                .build();
+        }
+    }
+
+    /**
+     * {@code PUT  /facilities/{facilityId}/employees/{id}} : Update an employee's details.
+     *
+     * @param facilityId the ID of the facility
+     * @param id the ID of the employee to update
+     * @param request the request containing the updated employee details
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated employee,
+     * or with status {@code 400 (Bad Request)} if the employee cannot be updated.
+     */
+    @PutMapping("/facilities/{facilityId}/employees/{id}")
+    public ResponseEntity<FacilityEmployeeDTO> updateEmployee(
+        @PathVariable Long facilityId,
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateEmployeeRequest request
+    ) {
+        log.debug("REST request to update employee : {} for facility : {} with request: {}", id, facilityId, request);
+        try {
+            FacilityEmployee employee = facilityEmployeeService.updateEmployee(facilityId, id, request.getRole(), request.getPosition());
+            FacilityEmployeeDTO result = facilityEmployeeMapper.toDto(employee);
+            return ResponseEntity
+                .ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                .body(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .badRequest()
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "error", e.getMessage()))
+                .build();
+        }
+    }
+
+    /**
+     * Request class for adding an employee to a facility.
+     */
+    public static class AddEmployeeRequest {
+
+        @NotNull
+        private Long userId;
+
+        @NotNull
+        private EmployeeRoleEnum role;
+
+        @NotNull
+        private String position;
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public EmployeeRoleEnum getRole() {
+            return role;
+        }
+
+        public void setRole(EmployeeRoleEnum role) {
+            this.role = role;
+        }
+
+        public String getPosition() {
+            return position;
+        }
+
+        public void setPosition(String position) {
+            this.position = position;
+        }
+    }
+
+    /**
+     * Request class for updating an employee.
+     */
+    public static class UpdateEmployeeRequest {
+
+        @NotNull
+        private EmployeeRoleEnum role;
+
+        @NotNull
+        private String position;
+
+        public EmployeeRoleEnum getRole() {
+            return role;
+        }
+
+        public void setRole(EmployeeRoleEnum role) {
+            this.role = role;
+        }
+
+        public String getPosition() {
+            return position;
+        }
+
+        public void setPosition(String position) {
+            this.position = position;
         }
     }
 }
