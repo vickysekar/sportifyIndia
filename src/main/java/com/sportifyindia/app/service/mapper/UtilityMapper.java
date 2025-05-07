@@ -15,10 +15,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface UtilityMapper extends EntityMapper<UtilityDTO, Utility> {
-    @Mapping(target = "facility", source = "facility", qualifiedByName = "facilityId")
+    @Mapping(target = "facilityId", source = "facility.id")
     @Mapping(target = "utilityAvailableDays", source = "utilityAvailableDays", qualifiedByName = "utilityAvailableDaysIdSet")
     UtilityDTO toDto(Utility s);
 
+    @Mapping(target = "facility", source = "facilityId", qualifiedByName = "facilityId")
     @Mapping(target = "removeUtilityAvailableDays", ignore = true)
     Utility toEntity(UtilityDTO utilityDTO);
 
@@ -30,6 +31,8 @@ public interface UtilityMapper extends EntityMapper<UtilityDTO, Utility> {
     @Named("utilityAvailableDaysId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "daysOfWeek", source = "daysOfWeek")
+    @Mapping(target = "timeSlots", source = "timeSlots")
     UtilityAvailableDaysDTO toDtoUtilityAvailableDaysId(UtilityAvailableDays utilityAvailableDays);
 
     @Named("utilityAvailableDaysIdSet")

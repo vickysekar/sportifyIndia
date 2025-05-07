@@ -38,7 +38,7 @@ public class UtilityDTO implements Serializable {
     @NotNull
     private UtilityStatusEnum status;
 
-    private FacilityDTO facility;
+    private Long facilityId;
 
     private Set<UtilityAvailableDaysDTO> utilityAvailableDays = new HashSet<>();
 
@@ -122,12 +122,12 @@ public class UtilityDTO implements Serializable {
         this.status = status;
     }
 
-    public FacilityDTO getFacility() {
-        return facility;
+    public Long getFacilityId() {
+        return facilityId;
     }
 
-    public void setFacility(FacilityDTO facility) {
-        this.facility = facility;
+    public void setFacilityId(Long facilityId) {
+        this.facilityId = facilityId;
     }
 
     public Set<UtilityAvailableDaysDTO> getUtilityAvailableDays() {
@@ -173,7 +173,7 @@ public class UtilityDTO implements Serializable {
             ", longitude=" + getLongitude() +
             ", requirements='" + getRequirements() + "'" +
             ", status='" + getStatus() + "'" +
-            ", facility=" + getFacility() +
+            ", facilityId=" + getFacilityId() +
             ", utilityAvailableDays=" + getUtilityAvailableDays() +
             "}";
     }

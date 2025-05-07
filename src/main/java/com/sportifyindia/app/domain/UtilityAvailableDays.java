@@ -1,6 +1,7 @@
 package com.sportifyindia.app.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sportifyindia.app.domain.enumeration.DaysOfWeekEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -29,7 +30,8 @@ public class UtilityAvailableDays extends AbstractAuditingEntity<Long> implement
     @NotNull
     @Column(name = "days_of_week", nullable = false)
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String daysOfWeek;
+    @Enumerated(EnumType.STRING)
+    private DaysOfWeekEnum daysOfWeek;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "subscriptionAvailableDays", "utilityAvailableDays", "utilitySlots" }, allowSetters = true)
@@ -59,16 +61,16 @@ public class UtilityAvailableDays extends AbstractAuditingEntity<Long> implement
         this.id = id;
     }
 
-    public String getDaysOfWeek() {
+    public DaysOfWeekEnum getDaysOfWeek() {
         return this.daysOfWeek;
     }
 
-    public UtilityAvailableDays daysOfWeek(String daysOfWeek) {
+    public UtilityAvailableDays daysOfWeek(DaysOfWeekEnum daysOfWeek) {
         this.setDaysOfWeek(daysOfWeek);
         return this;
     }
 
-    public void setDaysOfWeek(String daysOfWeek) {
+    public void setDaysOfWeek(DaysOfWeekEnum daysOfWeek) {
         this.daysOfWeek = daysOfWeek;
     }
 

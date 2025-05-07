@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -27,4 +28,7 @@ public interface UtilityRepository extends UtilityRepositoryWithBagRelationships
     default Page<Utility> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
     }
+
+    @Query("select utility from Utility utility where utility.facility.id = :facilityId")
+    Page<Utility> findByFacilityId(@Param("facilityId") Long facilityId, Pageable pageable);
 }

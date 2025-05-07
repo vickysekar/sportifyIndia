@@ -1,7 +1,9 @@
 package com.sportifyindia.app.service.dto;
 
+import com.sportifyindia.app.domain.enumeration.DaysOfWeekEnum;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,9 +15,10 @@ public class UtilityAvailableDaysDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private String daysOfWeek;
+    private DaysOfWeekEnum daysOfWeek;
 
-    private TimeSlotsDTO timeSlots;
+    @NotNull
+    private List<TimeSlotDTO> timeSlots;
 
     public Long getId() {
         return id;
@@ -25,19 +28,19 @@ public class UtilityAvailableDaysDTO implements Serializable {
         this.id = id;
     }
 
-    public String getDaysOfWeek() {
+    public DaysOfWeekEnum getDaysOfWeek() {
         return daysOfWeek;
     }
 
-    public void setDaysOfWeek(String daysOfWeek) {
+    public void setDaysOfWeek(DaysOfWeekEnum daysOfWeek) {
         this.daysOfWeek = daysOfWeek;
     }
 
-    public TimeSlotsDTO getTimeSlots() {
+    public List<TimeSlotDTO> getTimeSlots() {
         return timeSlots;
     }
 
-    public void setTimeSlots(TimeSlotsDTO timeSlots) {
+    public void setTimeSlots(List<TimeSlotDTO> timeSlots) {
         this.timeSlots = timeSlots;
     }
 
