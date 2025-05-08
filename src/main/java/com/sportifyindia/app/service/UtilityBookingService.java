@@ -74,7 +74,7 @@ public class UtilityBookingService {
         booking.setBookedQuantity(quantity);
         booking.setStartTime(slot.getStartTime());
         booking.setEndTime(slot.getEndTime());
-        booking.setStatus(BookingStatusEnum.CONFIRMED);
+        booking.setStatus(BookingStatusEnum.INITIATED);
         booking.setAmountPaid(utility.getPricePerSlot().multiply(new java.math.BigDecimal(quantity)));
 
         // Update slot capacity
