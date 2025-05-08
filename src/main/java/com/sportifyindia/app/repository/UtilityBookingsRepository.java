@@ -29,4 +29,7 @@ public interface UtilityBookingsRepository extends JpaRepository<UtilityBookings
         @Param("endDate") Instant endDate,
         Pageable pageable
     );
+
+    @Query("select ub from UtilityBookings ub where ub.user.id = :userId")
+    Page<UtilityBookings> findByUserId(@Param("userId") Long userId, Pageable pageable);
 }

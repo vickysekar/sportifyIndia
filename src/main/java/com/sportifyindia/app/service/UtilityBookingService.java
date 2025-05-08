@@ -70,6 +70,7 @@ public class UtilityBookingService {
         UtilityBookings booking = new UtilityBookings();
         booking.setUtility(utility);
         booking.setUtilitySlots(slot);
+        booking.setUser(user);
         booking.setBookedQuantity(quantity);
         booking.setStartTime(slot.getStartTime());
         booking.setEndTime(slot.getEndTime());

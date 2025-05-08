@@ -61,6 +61,11 @@ public class UtilityBookings extends AbstractAuditingEntity<Long> implements Ser
     @JsonIgnoreProperties(value = { "utility", "timeSlots", "utilityBookings" }, allowSetters = true)
     private UtilitySlots utilitySlots;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties(value = { "authorities", "createdBy", "lastModifiedBy" }, allowSetters = true)
+    private User user;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -164,6 +169,19 @@ public class UtilityBookings extends AbstractAuditingEntity<Long> implements Ser
 
     public UtilityBookings utilitySlots(UtilitySlots utilitySlots) {
         this.setUtilitySlots(utilitySlots);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public UtilityBookings user(User user) {
+        this.setUser(user);
         return this;
     }
 
