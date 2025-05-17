@@ -70,8 +70,8 @@ public class Payment extends AbstractAuditingEntity<Long> implements Serializabl
     private String paymentGateway;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "charges", "payments" }, allowSetters = true)
-    private Order order;
+    @JsonIgnoreProperties(value = { "payments" }, allowSetters = true)
+    private Charge charge;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -208,16 +208,16 @@ public class Payment extends AbstractAuditingEntity<Long> implements Serializabl
         this.paymentGateway = paymentGateway;
     }
 
-    public Order getOrder() {
-        return this.order;
+    public Charge getCharge() {
+        return this.charge;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setCharge(Charge charge) {
+        this.charge = charge;
     }
 
-    public Payment order(Order order) {
-        this.setOrder(order);
+    public Payment charge(Charge charge) {
+        this.setCharge(charge);
         return this;
     }
 

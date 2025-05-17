@@ -2,6 +2,7 @@ package com.sportifyindia.app.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sportifyindia.app.domain.enumeration.BusinessEntityEnum;
+import com.sportifyindia.app.domain.enumeration.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -35,6 +36,16 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
     private BusinessEntityEnum beType;
 
     @NotNull
+    @Column(name = "be_id", nullable = false)
+    private Long beId;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private OrderStatus orderStatus;
+
+    @NotNull
     @Column(name = "computed_charge", precision = 21, scale = 2, nullable = false)
     private BigDecimal computedCharge;
 
@@ -62,10 +73,6 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
     private BigDecimal finalCharge;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "charges", "payments" }, allowSetters = true)
-    private Order order;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "charge")
@@ -73,6 +80,12 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
     @org.springframework.data.annotation.Transient
     @JsonIgnoreProperties(value = { "charge" }, allowSetters = true)
     private Set<Tax> taxes = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "charge")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @org.springframework.data.annotation.Transient
+    @JsonIgnoreProperties(value = { "charge" }, allowSetters = true)
+    private Set<Payment> payments = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -100,6 +113,32 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
 
     public void setBeType(BusinessEntityEnum beType) {
         this.beType = beType;
+    }
+
+    public Long getBeId() {
+        return this.beId;
+    }
+
+    public Charge beId(Long beId) {
+        this.setBeId(beId);
+        return this;
+    }
+
+    public void setBeId(Long beId) {
+        this.beId = beId;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return this.orderStatus;
+    }
+
+    public Charge orderStatus(OrderStatus orderStatus) {
+        this.setOrderStatus(orderStatus);
+        return this;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public BigDecimal getComputedCharge() {
@@ -193,19 +232,6 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
         this.finalCharge = finalCharge;
     }
 
-    public Order getOrder() {
-        return this.order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public Charge order(Order order) {
-        this.setOrder(order);
-        return this;
-    }
-
     public User getUser() {
         return this.user;
     }
@@ -250,6 +276,37 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
         return this;
     }
 
+    public Set<Payment> getPayments() {
+        return this.payments;
+    }
+
+    public void setPayments(Set<Payment> payments) {
+        if (this.payments != null) {
+            this.payments.forEach(i -> i.setCharge(null));
+        }
+        if (payments != null) {
+            payments.forEach(i -> i.setCharge(this));
+        }
+        this.payments = payments;
+    }
+
+    public Charge payments(Set<Payment> payments) {
+        this.setPayments(payments);
+        return this;
+    }
+
+    public Charge addPayment(Payment payment) {
+        this.payments.add(payment);
+        payment.setCharge(this);
+        return this;
+    }
+
+    public Charge removePayment(Payment payment) {
+        this.payments.remove(payment);
+        payment.setCharge(null);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -275,6 +332,8 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
         return "Charge{" +
             "id=" + getId() +
             ", beType='" + getBeType() + "'" +
+            ", beId=" + getBeId() +
+            ", orderStatus='" + getOrderStatus() + "'" +
             ", computedCharge=" + getComputedCharge() +
             ", computedDiscount=" + getComputedDiscount() +
             ", total=" + getTotal() +

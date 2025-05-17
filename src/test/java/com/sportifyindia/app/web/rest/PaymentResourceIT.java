@@ -47,7 +47,7 @@ class PaymentResourceIT {
     private static final String DEFAULT_CURRENCY = "AAAAAAAAAA";
     private static final String UPDATED_CURRENCY = "BBBBBBBBBB";
 
-    private static final PaymentStatusEnum DEFAULT_PAYMENT_STATUS = PaymentStatusEnum.PENDING;
+    private static final PaymentStatusEnum DEFAULT_PAYMENT_STATUS = PaymentStatusEnum.INITIATED;
     private static final PaymentStatusEnum UPDATED_PAYMENT_STATUS = PaymentStatusEnum.SUCCESS;
 
     private static final String DEFAULT_GATEWAY_STATUS = "AAAAAAAAAA";

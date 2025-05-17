@@ -44,6 +44,9 @@ class ChargeResourceIT {
     private static final BusinessEntityEnum DEFAULT_BE_TYPE = BusinessEntityEnum.SUBSCRIPTION;
     private static final BusinessEntityEnum UPDATED_BE_TYPE = BusinessEntityEnum.ONETIME_EVENT;
 
+    private static final Long DEFAULT_BE_ID = 1L;
+    private static final Long UPDATED_BE_ID = 2L;
+
     private static final BigDecimal DEFAULT_COMPUTED_CHARGE = new BigDecimal(1);
     private static final BigDecimal UPDATED_COMPUTED_CHARGE = new BigDecimal(2);
 
@@ -98,6 +101,7 @@ class ChargeResourceIT {
     public static Charge createEntity(EntityManager em) {
         Charge charge = new Charge()
             .beType(DEFAULT_BE_TYPE)
+            .beId(DEFAULT_BE_ID)
             .computedCharge(DEFAULT_COMPUTED_CHARGE)
             .computedDiscount(DEFAULT_COMPUTED_DISCOUNT)
             .total(DEFAULT_TOTAL)
@@ -117,6 +121,7 @@ class ChargeResourceIT {
     public static Charge createUpdatedEntity(EntityManager em) {
         Charge charge = new Charge()
             .beType(UPDATED_BE_TYPE)
+            .beId(UPDATED_BE_ID)
             .computedCharge(UPDATED_COMPUTED_CHARGE)
             .computedDiscount(UPDATED_COMPUTED_DISCOUNT)
             .total(UPDATED_TOTAL)
@@ -160,6 +165,7 @@ class ChargeResourceIT {
             });
         Charge testCharge = chargeList.get(chargeList.size() - 1);
         assertThat(testCharge.getBeType()).isEqualTo(DEFAULT_BE_TYPE);
+        assertThat(testCharge.getBeId()).isEqualTo(DEFAULT_BE_ID);
         assertThat(testCharge.getComputedCharge()).isEqualByComparingTo(DEFAULT_COMPUTED_CHARGE);
         assertThat(testCharge.getComputedDiscount()).isEqualByComparingTo(DEFAULT_COMPUTED_DISCOUNT);
         assertThat(testCharge.getTotal()).isEqualByComparingTo(DEFAULT_TOTAL);
@@ -309,6 +315,7 @@ class ChargeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(charge.getId().intValue())))
             .andExpect(jsonPath("$.[*].beType").value(hasItem(DEFAULT_BE_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].beId").value(hasItem(DEFAULT_BE_ID.intValue())))
             .andExpect(jsonPath("$.[*].computedCharge").value(hasItem(sameNumber(DEFAULT_COMPUTED_CHARGE))))
             .andExpect(jsonPath("$.[*].computedDiscount").value(hasItem(sameNumber(DEFAULT_COMPUTED_DISCOUNT))))
             .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))
@@ -331,6 +338,7 @@ class ChargeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(charge.getId().intValue()))
             .andExpect(jsonPath("$.beType").value(DEFAULT_BE_TYPE.toString()))
+            .andExpect(jsonPath("$.beId").value(DEFAULT_BE_ID.intValue()))
             .andExpect(jsonPath("$.computedCharge").value(sameNumber(DEFAULT_COMPUTED_CHARGE)))
             .andExpect(jsonPath("$.computedDiscount").value(sameNumber(DEFAULT_COMPUTED_DISCOUNT)))
             .andExpect(jsonPath("$.total").value(sameNumber(DEFAULT_TOTAL)))
@@ -363,6 +371,7 @@ class ChargeResourceIT {
         em.detach(updatedCharge);
         updatedCharge
             .beType(UPDATED_BE_TYPE)
+            .beId(UPDATED_BE_ID)
             .computedCharge(UPDATED_COMPUTED_CHARGE)
             .computedDiscount(UPDATED_COMPUTED_DISCOUNT)
             .total(UPDATED_TOTAL)
@@ -385,6 +394,7 @@ class ChargeResourceIT {
         assertThat(chargeList).hasSize(databaseSizeBeforeUpdate);
         Charge testCharge = chargeList.get(chargeList.size() - 1);
         assertThat(testCharge.getBeType()).isEqualTo(UPDATED_BE_TYPE);
+        assertThat(testCharge.getBeId()).isEqualTo(UPDATED_BE_ID);
         assertThat(testCharge.getComputedCharge()).isEqualByComparingTo(UPDATED_COMPUTED_CHARGE);
         assertThat(testCharge.getComputedDiscount()).isEqualByComparingTo(UPDATED_COMPUTED_DISCOUNT);
         assertThat(testCharge.getTotal()).isEqualByComparingTo(UPDATED_TOTAL);
@@ -400,6 +410,7 @@ class ChargeResourceIT {
                 List<Charge> chargeSearchList = IterableUtils.toList(chargeSearchRepository.findAll());
                 Charge testChargeSearch = chargeSearchList.get(searchDatabaseSizeAfter - 1);
                 assertThat(testChargeSearch.getBeType()).isEqualTo(UPDATED_BE_TYPE);
+                assertThat(testChargeSearch.getBeId()).isEqualTo(UPDATED_BE_ID);
                 assertThat(testChargeSearch.getComputedCharge()).isEqualByComparingTo(UPDATED_COMPUTED_CHARGE);
                 assertThat(testChargeSearch.getComputedDiscount()).isEqualByComparingTo(UPDATED_COMPUTED_DISCOUNT);
                 assertThat(testChargeSearch.getTotal()).isEqualByComparingTo(UPDATED_TOTAL);
@@ -498,6 +509,7 @@ class ChargeResourceIT {
 
         partialUpdatedCharge
             .beType(UPDATED_BE_TYPE)
+            .beId(UPDATED_BE_ID)
             .computedDiscount(UPDATED_COMPUTED_DISCOUNT)
             .currency(UPDATED_CURRENCY)
             .exchangeRate(UPDATED_EXCHANGE_RATE)
@@ -516,6 +528,7 @@ class ChargeResourceIT {
         assertThat(chargeList).hasSize(databaseSizeBeforeUpdate);
         Charge testCharge = chargeList.get(chargeList.size() - 1);
         assertThat(testCharge.getBeType()).isEqualTo(UPDATED_BE_TYPE);
+        assertThat(testCharge.getBeId()).isEqualTo(UPDATED_BE_ID);
         assertThat(testCharge.getComputedCharge()).isEqualByComparingTo(DEFAULT_COMPUTED_CHARGE);
         assertThat(testCharge.getComputedDiscount()).isEqualByComparingTo(UPDATED_COMPUTED_DISCOUNT);
         assertThat(testCharge.getTotal()).isEqualByComparingTo(DEFAULT_TOTAL);
@@ -539,6 +552,7 @@ class ChargeResourceIT {
 
         partialUpdatedCharge
             .beType(UPDATED_BE_TYPE)
+            .beId(UPDATED_BE_ID)
             .computedCharge(UPDATED_COMPUTED_CHARGE)
             .computedDiscount(UPDATED_COMPUTED_DISCOUNT)
             .total(UPDATED_TOTAL)
@@ -560,6 +574,7 @@ class ChargeResourceIT {
         assertThat(chargeList).hasSize(databaseSizeBeforeUpdate);
         Charge testCharge = chargeList.get(chargeList.size() - 1);
         assertThat(testCharge.getBeType()).isEqualTo(UPDATED_BE_TYPE);
+        assertThat(testCharge.getBeId()).isEqualTo(UPDATED_BE_ID);
         assertThat(testCharge.getComputedCharge()).isEqualByComparingTo(UPDATED_COMPUTED_CHARGE);
         assertThat(testCharge.getComputedDiscount()).isEqualByComparingTo(UPDATED_COMPUTED_DISCOUNT);
         assertThat(testCharge.getTotal()).isEqualByComparingTo(UPDATED_TOTAL);
@@ -683,6 +698,7 @@ class ChargeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(charge.getId().intValue())))
             .andExpect(jsonPath("$.[*].beType").value(hasItem(DEFAULT_BE_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].beId").value(hasItem(DEFAULT_BE_ID.intValue())))
             .andExpect(jsonPath("$.[*].computedCharge").value(hasItem(sameNumber(DEFAULT_COMPUTED_CHARGE))))
             .andExpect(jsonPath("$.[*].computedDiscount").value(hasItem(sameNumber(DEFAULT_COMPUTED_DISCOUNT))))
             .andExpect(jsonPath("$.[*].total").value(hasItem(sameNumber(DEFAULT_TOTAL))))

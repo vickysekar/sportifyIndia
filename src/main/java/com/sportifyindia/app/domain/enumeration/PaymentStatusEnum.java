@@ -4,7 +4,7 @@ package com.sportifyindia.app.domain.enumeration;
  * The PaymentStatusEnum enumeration.
  */
 public enum PaymentStatusEnum {
-    PENDING,
+    INITIATED,
     SUCCESS,
     FAILED,
     REFUNDED,

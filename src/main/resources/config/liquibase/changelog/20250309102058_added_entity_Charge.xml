@@ -17,6 +17,12 @@
             <column name="be_type" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
+            <column name="be_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="order_status" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
             <column name="computed_charge" type="decimal(21,2)">
                 <constraints nullable="false" />
             </column>
@@ -37,9 +43,6 @@
             </column>
             <column name="final_charge" type="decimal(21,2)">
                 <constraints nullable="false" />
-            </column>
-            <column name="order_id" type="bigint">
-                <constraints nullable="true" />
             </column>
             <column name="user_id" type="bigint">
                 <constraints nullable="true" />
@@ -66,6 +69,8 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="be_type" type="string"/>
+            <column name="be_id" type="numeric"/>
+            <column name="order_status" type="string"/>
             <column name="computed_charge" type="numeric"/>
             <column name="computed_discount" type="numeric"/>
             <column name="total" type="numeric"/>

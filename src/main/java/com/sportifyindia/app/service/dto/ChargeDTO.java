@@ -1,6 +1,7 @@
 package com.sportifyindia.app.service.dto;
 
 import com.sportifyindia.app.domain.enumeration.BusinessEntityEnum;
+import com.sportifyindia.app.domain.enumeration.OrderStatus;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +17,12 @@ public class ChargeDTO implements Serializable {
 
     @NotNull
     private BusinessEntityEnum beType;
+
+    @NotNull
+    private Long beId;
+
+    @NotNull
+    private OrderStatus orderStatus;
 
     @NotNull
     private BigDecimal computedCharge;
@@ -35,8 +42,6 @@ public class ChargeDTO implements Serializable {
     @NotNull
     private BigDecimal finalCharge;
 
-    private OrderDTO order;
-
     private UserDTO user;
 
     public Long getId() {
@@ -53,6 +58,22 @@ public class ChargeDTO implements Serializable {
 
     public void setBeType(BusinessEntityEnum beType) {
         this.beType = beType;
+    }
+
+    public Long getBeId() {
+        return beId;
+    }
+
+    public void setBeId(Long beId) {
+        this.beId = beId;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public BigDecimal getComputedCharge() {
@@ -111,14 +132,6 @@ public class ChargeDTO implements Serializable {
         this.finalCharge = finalCharge;
     }
 
-    public OrderDTO getOrder() {
-        return order;
-    }
-
-    public void setOrder(OrderDTO order) {
-        this.order = order;
-    }
-
     public UserDTO getUser() {
         return user;
     }
@@ -154,6 +167,8 @@ public class ChargeDTO implements Serializable {
         return "ChargeDTO{" +
             "id=" + getId() +
             ", beType='" + getBeType() + "'" +
+            ", beId=" + getBeId() +
+            ", orderStatus='" + getOrderStatus() + "'" +
             ", computedCharge=" + getComputedCharge() +
             ", computedDiscount=" + getComputedDiscount() +
             ", total=" + getTotal() +
@@ -161,7 +176,6 @@ public class ChargeDTO implements Serializable {
             ", discReason='" + getDiscReason() + "'" +
             ", exchangeRate=" + getExchangeRate() +
             ", finalCharge=" + getFinalCharge() +
-            ", order=" + getOrder() +
             ", user=" + getUser() +
             "}";
     }
