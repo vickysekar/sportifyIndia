@@ -74,6 +74,10 @@ public class Payment extends AbstractAuditingEntity<Long> implements Serializabl
     private Charge charge;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "payments" }, allowSetters = true)
+    private Facility facility;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -221,6 +225,19 @@ public class Payment extends AbstractAuditingEntity<Long> implements Serializabl
         return this;
     }
 
+    public Facility getFacility() {
+        return this.facility;
+    }
+
+    public void setFacility(Facility facility) {
+        this.facility = facility;
+    }
+
+    public Payment facility(Facility facility) {
+        this.setFacility(facility);
+        return this;
+    }
+
     public User getUser() {
         return this.user;
     }
@@ -267,6 +284,7 @@ public class Payment extends AbstractAuditingEntity<Long> implements Serializabl
             ", transactionId='" + getTransactionId() + "'" +
             ", token='" + getToken() + "'" +
             ", paymentGateway='" + getPaymentGateway() + "'" +
+            ", facility=" + getFacility() +
             "}";
     }
 }

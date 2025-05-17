@@ -1,6 +1,7 @@
 package com.sportifyindia.app.service.dto;
 
 import com.sportifyindia.app.domain.enumeration.BusinessEntityEnum;
+import com.sportifyindia.app.domain.enumeration.ChargeSource;
 import com.sportifyindia.app.domain.enumeration.OrderStatus;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -20,6 +21,9 @@ public class ChargeDTO implements Serializable {
 
     @NotNull
     private Long beId;
+
+    @NotNull
+    private ChargeSource chargeSource;
 
     @NotNull
     private OrderStatus orderStatus;
@@ -66,6 +70,14 @@ public class ChargeDTO implements Serializable {
 
     public void setBeId(Long beId) {
         this.beId = beId;
+    }
+
+    public ChargeSource getSource() {
+        return chargeSource;
+    }
+
+    public void setSource(ChargeSource chargeSource) {
+        this.chargeSource = chargeSource;
     }
 
     public OrderStatus getOrderStatus() {
@@ -168,6 +180,7 @@ public class ChargeDTO implements Serializable {
             "id=" + getId() +
             ", beType='" + getBeType() + "'" +
             ", beId=" + getBeId() +
+            ", chargeSource='" + getSource() + "'" +
             ", orderStatus='" + getOrderStatus() + "'" +
             ", computedCharge=" + getComputedCharge() +
             ", computedDiscount=" + getComputedDiscount() +

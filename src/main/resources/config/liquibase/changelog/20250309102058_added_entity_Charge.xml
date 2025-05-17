@@ -20,6 +20,9 @@
             <column name="be_id" type="bigint">
                 <constraints nullable="false" />
             </column>
+            <column name="chargeSource" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
             <column name="order_status" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
@@ -70,6 +73,7 @@
             <column name="id" type="numeric"/>
             <column name="be_type" type="string"/>
             <column name="be_id" type="numeric"/>
+            <column name="chargeSource" type="string"/>
             <column name="order_status" type="string"/>
             <column name="computed_charge" type="numeric"/>
             <column name="computed_discount" type="numeric"/>

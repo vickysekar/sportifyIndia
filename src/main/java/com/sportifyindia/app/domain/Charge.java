@@ -2,6 +2,7 @@ package com.sportifyindia.app.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sportifyindia.app.domain.enumeration.BusinessEntityEnum;
+import com.sportifyindia.app.domain.enumeration.ChargeSource;
 import com.sportifyindia.app.domain.enumeration.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -38,6 +39,12 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
     @NotNull
     @Column(name = "be_id", nullable = false)
     private Long beId;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chargeSource", nullable = false)
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private ChargeSource chargeSource;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -126,6 +133,19 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
 
     public void setBeId(Long beId) {
         this.beId = beId;
+    }
+
+    public ChargeSource getSource() {
+        return this.chargeSource;
+    }
+
+    public Charge source(ChargeSource chargeSource) {
+        this.setSource(chargeSource);
+        return this;
+    }
+
+    public void setSource(ChargeSource chargeSource) {
+        this.chargeSource = chargeSource;
     }
 
     public OrderStatus getOrderStatus() {
@@ -333,6 +353,7 @@ public class Charge extends AbstractAuditingEntity<Long> implements Serializable
             "id=" + getId() +
             ", beType='" + getBeType() + "'" +
             ", beId=" + getBeId() +
+            ", chargeSource='" + getSource() + "'" +
             ", orderStatus='" + getOrderStatus() + "'" +
             ", computedCharge=" + getComputedCharge() +
             ", computedDiscount=" + getComputedDiscount() +

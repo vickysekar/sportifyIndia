@@ -39,7 +39,9 @@ public class PaymentDTO implements Serializable {
     @NotNull
     private String paymentGateway;
 
-    private OrderDTO order;
+    private ChargeDTO charge;
+
+    private FacilityDTO facility;
 
     private UserDTO user;
 
@@ -123,12 +125,20 @@ public class PaymentDTO implements Serializable {
         this.paymentGateway = paymentGateway;
     }
 
-    public OrderDTO getOrder() {
-        return order;
+    public ChargeDTO getCharge() {
+        return charge;
     }
 
-    public void setOrder(OrderDTO order) {
-        this.order = order;
+    public void setCharge(ChargeDTO charge) {
+        this.charge = charge;
+    }
+
+    public FacilityDTO getFacility() {
+        return facility;
+    }
+
+    public void setFacility(FacilityDTO facility) {
+        this.facility = facility;
     }
 
     public UserDTO getUser() {
@@ -174,7 +184,8 @@ public class PaymentDTO implements Serializable {
             ", transactionId='" + getTransactionId() + "'" +
             ", token='" + getToken() + "'" +
             ", paymentGateway='" + getPaymentGateway() + "'" +
-            ", order=" + getOrder() +
+            ", charge=" + getCharge() +
+            ", facility=" + getFacility() +
             ", user=" + getUser() +
             "}";
     }
